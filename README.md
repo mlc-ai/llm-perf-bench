@@ -5,13 +5,14 @@ LLM Performance Benchmarking
 
 | Model      | GPU         | MLC LLM (tok/sec) | Exllama (tok/sec) |
 |------------|-------------|-------------------|-------------------|
-| Llama2-7B  | RTX 3090 Ti | 154.1             | 116.38            |
-| Llama2-13B | RTX 3090 Ti | 93.1              | 70.45             |
-
+| Llama2-7B  | RTX 3090 Ti | 166.7             | 112.72            |
+| Llama2-13B | RTX 3090 Ti | 99.2              | 69.31             |
+| Llama2-7B  | RTX 4090    | 191.0             | 152.56            |
+| Llama2-13B | RTX 4090    | 108.8             | 93.88             |
 
 Commit:
-- MLC LLM: [113bf7c97410b422bf2b0bb52887156a50f26390](https://github.com/mlc-ai/mlc-llm/tree/113bf7c97410b422bf2b0bb52887156a50f26390)
-- Exllama: [91b9b1295dd9083499fff3d0088c2c1b3c863dc7](https://github.com/turboderp/exllama/tree/91b9b1295dd9083499fff3d0088c2c1b3c863dc7)
+- MLC LLM [commit](https://github.com/mlc-ai/mlc-llm/commit/502f6808b8073b87e561817a5a80b50810ab47be), TVM [commit](https://github.com/apache/tvm/commit/543838303b4289bb5669688efb9f88b15ddc2ebe);
+- Exllama [commit](https://github.com/turboderp/exllama/commit/c16cf49c3f19e887da31d671a713619c8626484e).
 
 
 ## Instructions
@@ -30,7 +31,7 @@ docker build -t llm-perf-mlc:v0.1 -f Dockerfile.cu121.mlc .
 
 ```bash
 PORT=45678
-MODELS=/PATH/TO/MODEL/
+MODELS=/PATH/TO/MODEL/ # Replace the path to HuggingFace models
 
 docker run            \
   -d -P               \
@@ -49,7 +50,7 @@ micromamba activate python311
 
 cd $MLC_HOME
 python build.py \
-  --model /models/PATH/TO/Llama-2-7b-chat-hf \
+  --model /models/Llama-2-7b-chat-hf \  # Replace it with path to HuggingFace models
   --target cuda \
   --quantization q4f16_1 \
   --artifact-path "./dist" \
