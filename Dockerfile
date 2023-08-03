@@ -7,7 +7,7 @@ SHELL ["/bin/bash", "-ec"]
 # Step 1. Set up Ubuntu
 RUN grep -v '[ -z "\$PS1" ] && return' ~/.bashrc >/tmp/bashrc               && \
     mv /tmp/bashrc ~/.bashrc                                                && \
-    echo "export MLC_HOME=/mlc_llm/"                                        && \
+    echo "export MLC_HOME=/mlc_llm/" >>~/.bashrc                            && \
     echo "export PATH=/usr/local/cuda/bin/:\$PATH" >>~/.bashrc              && \
     echo "export LD_LIBRARY_PATH=/usr/local/cuda/lib64/:\$PATH" >>~/.bashrc && \
     ln -s /usr/local/cuda/lib64/stubs/libcuda.so                               \
