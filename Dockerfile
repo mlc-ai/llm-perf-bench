@@ -1,30 +1,43 @@
 FROM nvidia/cuda:12.1.0-devel-ubuntu22.04
 
-ENV MLC_HOME /mlc-llm
+SHELL ["/bin/bash", "-ec"]
 
 # Step 1. Set up Ubuntu
-RUN apt update && apt install --yes software-properties-common wget git curl vim cmake build-essential python3-pip openssh-server
-RUN echo "export PATH=/usr/local/cuda/bin/:\$PATH" >>~/.bashrc
-RUN echo "export LD_LIBRARY_PATH=/usr/local/cuda/lib64/:\$PATH" >>~/.bashrc
+RUN grep -v '[ -z "\$PS1" ] && return' ~/.bashrc >/tmp/bashrc               && \
+    mv /tmp/bashrc ~/.bashrc                                                && \
+    echo "export MLC_HOME=/mlc_llm/"                                        && \
+    echo "export PATH=/usr/local/cuda/bin/:\$PATH" >>~/.bashrc              && \
+    echo "export LD_LIBRARY_PATH=/usr/local/cuda/lib64/:\$PATH" >>~/.bashrc && \
+    ln -s /usr/local/cuda/lib64/stubs/libcuda.so                               \
+          /usr/local/cuda/lib64/stubs/libcuda.so.1                          && \
+    apt update                                                              && \
+    apt install --yes wget curl git vim build-essential openssh-server
 
-# Step 2. Set up SSH
+# Step 2. Set up python
+RUN bash <(curl -L micro.mamba.pm/install.sh) && source ~/.bashrc       && \
+    micromamba create --yes -n python311 -c conda-forge                    \
+    python=3.11 "cmake>=3.24"                                              \
+    pytorch-cpu rust sentencepiece protobuf
+
+# Step 3. Set up TVM Unity
+RUN source ~/.bashrc && micromamba activate python311                   && \
+    pip install --pre mlc-ai-nightly-cu121 -f https://mlc.ai/wheels
+
+# Step 4. Compile MLC command line
+RUN source ~/.bashrc && micromamba activate python311                   && \
+    git clone --recursive https://github.com/mlc-ai/mlc-llm/ $MLC_HOME  && \
+    cd $MLC_HOME && mkdir build && cd build && touch config.cmake       && \
+    echo "set(CMAKE_BUILD_TYPE RelWithDebInfo)" >>config.cmake          && \
+    echo "set(CMAKE_EXPORT_COMPILE_COMMANDS ON)" >>config.cmake         && \
+    echo "set(USE_CUDA ON)" >>config.cmake                              && \
+    echo "set(USE_VULKAN OFF)" >>config.cmake                           && \
+    echo "set(USE_METAL OFF)" >>config.cmake                            && \
+    echo "set(USE_OPENCL OFF)" >>config.cmake                           && \
+    cmake .. && make -j$(nproc)
+
+# Step 5. Set up SSH and expose SSH port
 COPY install/ssh.sh /install/ssh.sh
 RUN bash /install/ssh.sh
-
-# Step 3. Set up Python via conda
-COPY install/python.sh /install/python.sh
-RUN bash /install/python.sh
-
-# Step 4. Set up TVM Unity
-COPY install/tvm.sh /install/tvm.sh
-RUN git clone --recursive https://github.com/junrushao/mlc-llm/ --branch benchmark $MLC_HOME
-RUN bash /install/tvm.sh
-
-# Step 5. Compile MLC command line
-COPY install/mlc.sh /install/mlc.sh
-RUN bash /install/mlc.sh
-
-# Finally, expose SSH port
 WORKDIR /root
 EXPOSE 22
 CMD ["/usr/sbin/sshd", "-D"]

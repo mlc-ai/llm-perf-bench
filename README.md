@@ -10,7 +10,7 @@ MLC LLM Performance Benchmarking
 
 
 Commit:
-- MLC LLM: [c40be6a210e4d8844b8a65951bcfaa44b528b8f9](https://github.com/mlc-ai/mlc-llm/tree/c40be6a210e4d8844b8a65951bcfaa44b528b8f9)
+- MLC LLM: [113bf7c97410b422bf2b0bb52887156a50f26390](https://github.com/mlc-ai/mlc-llm/tree/113bf7c97410b422bf2b0bb52887156a50f26390)
 - Exllama: [91b9b1295dd9083499fff3d0088c2c1b3c863dc7](https://github.com/turboderp/exllama/tree/91b9b1295dd9083499fff3d0088c2c1b3c863dc7)
 
 
