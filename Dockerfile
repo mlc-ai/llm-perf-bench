@@ -5,14 +5,14 @@ FROM nvidia/cuda:12.1.0-devel-ubuntu22.04
 SHELL ["/bin/bash", "-ec"]
 
 # Step 1. Set up Ubuntu
-RUN grep -v '[ -z "\$PS1" ] && return' ~/.bashrc >/tmp/bashrc               && \
-    mv /tmp/bashrc ~/.bashrc                                                && \
-    echo "export MLC_HOME=/mlc_llm/" >>~/.bashrc                            && \
-    echo "export PATH=/usr/local/cuda/bin/:\$PATH" >>~/.bashrc              && \
-    echo "export LD_LIBRARY_PATH=/usr/local/cuda/lib64/:\$PATH" >>~/.bashrc && \
-    ln -s /usr/local/cuda/lib64/stubs/libcuda.so                               \
-          /usr/local/cuda/lib64/stubs/libcuda.so.1                          && \
-    apt update                                                              && \
+RUN grep -v '[ -z "\$PS1" ] && return' ~/.bashrc >/tmp/bashrc                     && \
+    mv /tmp/bashrc ~/.bashrc                                                      && \
+    echo "export MLC_HOME=/mlc_llm/" >>~/.bashrc                                  && \
+    echo "export PATH=/usr/local/cuda/bin/:\$PATH" >>~/.bashrc                    && \
+    echo "export LD_LIBRARY_PATH=/usr/local/cuda/lib64/stubs:\$PATH" >>~/.bashrc  && \
+    ln -s /usr/local/cuda/lib64/stubs/libcuda.so                                     \
+          /usr/local/cuda/lib64/stubs/libcuda.so.1                                && \
+    apt update                                                                    && \
     apt install --yes wget curl git vim build-essential openssh-server
 
 # Step 2. Set up python, including TVM Unity
