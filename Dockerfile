@@ -1,3 +1,5 @@
+# This Dockerfile is based on CUDA 12.1.
+# Please search and replace "12.1"/"121" if benchmarking on other CUDA versions.
 FROM nvidia/cuda:12.1.0-devel-ubuntu22.04
 
 SHELL ["/bin/bash", "-ec"]
@@ -13,17 +15,15 @@ RUN grep -v '[ -z "\$PS1" ] && return' ~/.bashrc >/tmp/bashrc               && \
     apt update                                                              && \
     apt install --yes wget curl git vim build-essential openssh-server
 
-# Step 2. Set up python
+# Step 2. Set up python, including TVM Unity
 RUN bash <(curl -L micro.mamba.pm/install.sh) && source ~/.bashrc       && \
     micromamba create --yes -n python311 -c conda-forge                    \
     python=3.11 "cmake>=3.24"                                              \
     pytorch-cpu rust sentencepiece protobuf
-
-# Step 3. Set up TVM Unity
 RUN source ~/.bashrc && micromamba activate python311                   && \
     pip install --pre mlc-ai-nightly-cu121 -f https://mlc.ai/wheels
 
-# Step 4. Compile MLC command line
+# Step 3. Compile MLC command line
 RUN source ~/.bashrc && micromamba activate python311                   && \
     git clone --recursive https://github.com/mlc-ai/mlc-llm/ $MLC_HOME  && \
     cd $MLC_HOME && mkdir build && cd build && touch config.cmake       && \
@@ -35,7 +35,7 @@ RUN source ~/.bashrc && micromamba activate python311                   && \
     echo "set(USE_OPENCL OFF)" >>config.cmake                           && \
     cmake .. && make -j$(nproc)
 
-# Step 5. Set up SSH and expose SSH port
+# Step 4. Set up SSH and expose SSH port
 COPY install/ssh.sh /install/ssh.sh
 RUN bash /install/ssh.sh
 WORKDIR /root
