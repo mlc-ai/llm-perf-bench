@@ -1,5 +1,5 @@
-MLC LLM Performance Benchmarking
---------------------------------
+LLM Performance Benchmarking
+----------------------------
 
 ## Performance Numbers
 
@@ -21,7 +21,7 @@ First of all, NVIDIA Docker is required: https://docs.nvidia.com/datacenter/clou
 ### Step 1. Build Docker image
 
 ```bash
-docker build -t mlc-perf:v0.1 .
+docker build -t mlc-perf:v0.1 -f Dockerfile.cu121.mlc .
 ```
 
 ### Step 2. Compile and run Llama2
@@ -40,7 +40,7 @@ docker run            \
   -p $PORT:22         \
   -v $MODELS:/models  \
   mlc-perf:v0.1
-ssh root@0.0.0.0 -p $PORT # password: mlc_llm_perf
+ssh root@0.0.0.0 -p $PORT # password: llm_perf
 ```
 
 > Note: There might be security concerns to allow direct root login. Here we mainly want to simplify the process as a quick demo.
