@@ -1,7 +1,7 @@
-MLC LLM Performance Benchmarking
---------------------------------
+LLM Performance Benchmarking
+----------------------------
 
-## Performance Numbers
+## Performance
 
 | Model      | GPU         | MLC LLM (tok/sec) | Exllama (tok/sec) |
 |------------|-------------|-------------------|-------------------|
@@ -10,49 +10,46 @@ MLC LLM Performance Benchmarking
 
 
 Commit:
-- MLC LLM: [c40be6a210e4d8844b8a65951bcfaa44b528b8f9](https://github.com/mlc-ai/mlc-llm/tree/c40be6a210e4d8844b8a65951bcfaa44b528b8f9)
+- MLC LLM: [113bf7c97410b422bf2b0bb52887156a50f26390](https://github.com/mlc-ai/mlc-llm/tree/113bf7c97410b422bf2b0bb52887156a50f26390)
 - Exllama: [91b9b1295dd9083499fff3d0088c2c1b3c863dc7](https://github.com/turboderp/exllama/tree/91b9b1295dd9083499fff3d0088c2c1b3c863dc7)
 
 
-## Step-by-step Guide
+## Instructions
 
 First of all, NVIDIA Docker is required: https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#docker.
 
-### Step 1. Build Docker image
+### MLC LLM
+
+**Step 1**. Build Docker image
 
 ```bash
-docker build -t mlc-perf:v0.1 .
+docker build -t llm-perf-mlc:v0.1 -f Dockerfile.cu121.mlc .
 ```
 
-### Step 2. Compile and run Llama2
-
-First, log in to the docker container we created using the comamnd below:
+**Step 2**. Quantize and run Llama2. Log in to the docker container we created using the comamnd below:
 
 ```bash
 PORT=45678
-MODELS=$HOME/models/
+MODELS=/PATH/TO/MODEL/
 
 docker run            \
   -d -P               \
   --gpus all          \
-  -h mlc-perf         \
-  --name mlc-perf     \
+  -h llm-perf         \
+  --name llm-perf     \
   -p $PORT:22         \
   -v $MODELS:/models  \
-  mlc-perf:v0.1
-ssh root@0.0.0.0 -p $PORT # password: mlc_llm_perf
-```
+  llm-perf-mlc:v0.1
 
-> Note: There might be security concerns to allow direct root login. Here we mainly want to simplify the process as a quick demo.
+# Password is: llm_perf
+ssh root@0.0.0.0 -p $PORT
 
-Then, compile Llama2 model using MLC inside the docker container:
-
-```bash
+# Inside the container, run the following commands:
 micromamba activate python311
 
 cd $MLC_HOME
 python build.py \
-  --model /models/Llama-2/hf/Llama-2-7b-chat-hf \
+  --model /models/PATH/TO/Llama-2-7b-chat-hf \
   --target cuda \
   --quantization q4f16_1 \
   --artifact-path "./dist" \
@@ -61,13 +58,21 @@ python build.py \
 
 The quantized and compiled model will be exported to `./dist/Llama-2-7b-chat-hf-q4f16_1`.
 
-Finally, run the model and see the performance numbers:
+**Step 3.** Run the CLI tool to see the performance numbers:
 
 ```bash
 $MLC_HOME/build/mlc_chat_cli \
   --model Llama-2-7b-chat-hf \
   --quantization q4f16_1
 ```
+
+### Exllama
+
+TBD
+
+### Llama.cpp
+
+TBD
 
 ## TODOs
 
