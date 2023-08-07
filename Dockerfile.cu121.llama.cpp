@@ -24,7 +24,7 @@ RUN bash <(curl -L micro.mamba.pm/install.sh) && source ~/.bashrc       && \
 # Step 3. Git clone and compile llama.cpp with cuBLAS
 RUN git clone https://github.com/ggerganov/llama.cpp.git $LLAMA_CPP_HOME && \
     cd llama.cpp                                                         && \
-    git checkout 332311234a0aa2974b2450710e22e09d90dd6b0b                && \
+    git checkout f3c3b4b1672d860800639c87d3b5d17564692469                && \
     make LLAMA_CUBLAS=1                                                  && \
     mkdir build                                                          && \
     cd build                                                             && \

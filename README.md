@@ -3,7 +3,6 @@ LLM Performance Benchmarking
 
 ## Performance
 
-
 | Model      | GPU         | MLC LLM (tok/sec) | Exllama (tok/sec) |
 |------------|-------------|-------------------|-------------------|
 | Llama2-7B  | RTX 3090 Ti | 166.7             | 112.72            |
@@ -14,7 +13,8 @@ LLM Performance Benchmarking
 Commit:
 - MLC LLM [commit](https://github.com/mlc-ai/mlc-llm/commit/502f6808b8073b87e561817a5a80b50810ab47be), TVM [commit](https://github.com/apache/tvm/commit/543838303b4289bb5669688efb9f88b15ddc2ebe);
 - Exllama [commit](https://github.com/turboderp/exllama/commit/c16cf49c3f19e887da31d671a713619c8626484e).
-- Llama.cpp: [332311234a0aa2974b2450710e22e09d90dd6b0b](https://github.com/ggerganov/llama.cpp/commit/332311234a0aa2974b2450710e22e09d90dd6b0b)
+- Llama.cpp: [commit](https://github.com/ggerganov/llama.cpp/commit/f3c3b4b1672d860800639c87d3b5d17564692469)
+
 
 ## Instructions
 
@@ -100,7 +100,6 @@ ssh root@0.0.0.0 -p $PORT
 
 # Inside the container, run the following commands:
 micromamba activate python311
-
 ```
 
 **Step 3.** Run the CLI tool to see the performance numbers:
@@ -110,7 +109,7 @@ You can download llama-2 7B GGML binary files from [here](https://huggingface.co
 
 ```bash
 cd $LLAMA_CPP_HOME
-./main -m /ggml_bins/GGML_BINARY_FILE -p "Please generate a very long story about wizard and technology, at least two thousand words" -n 1920 -ngl 999 --ignore-eos |& tee llama_cpp_result.log
+./build/bin/main -m /ggml_bins/GGML_BINARY_FILE -p "Please generate a very long story about wizard and technology, at least two thousand words" -n 1920 -ngl 999 --ignore-eos |& tee llama_cpp_result.log
 ```
 
 ## TODOs
