@@ -12,7 +12,7 @@ RUN grep -v '[ -z "\$PS1" ] && return' ~/.bashrc >/tmp/bashrc                   
     echo "export PATH=/usr/local/cuda/bin/:\$PATH" >>~/.bashrc                                && \
     ln -s /usr/local/cuda/lib64/stubs/libcuda.so /usr/lib/x86_64-linux-gnu/libcuda.so.1       && \
     apt update                                                                                && \
-    apt install --yes wget curl git vim build-essential openssh-server
+    apt install --yes wget curl git vim build-essential openssh-server cmake
 
 # Step 2. Set up python environment with micromamba
 RUN bash <(curl -L micro.mamba.pm/install.sh) && source ~/.bashrc       && \

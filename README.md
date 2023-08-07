@@ -90,7 +90,7 @@ docker run                  \
   -d -P                     \
   --gpus all                \
   -h llm-perf               \
-  --name llm-perf           \
+  --name llm-perf-llama.cpp \
   -p $PORT:22               \
   -v $GGML_BINS:/ggml_bins  \
   llm-perf-llama-cpp:v0.1
@@ -110,8 +110,7 @@ You can download llama-2 7B GGML binary files from [here](https://huggingface.co
 
 ```bash
 cd $LLAMA_CPP_HOME
-./main -m /ggml_bins/GGML_BINARY_FILE -p "Please generate a very long story about wizard and 
-technology, at least two thousand words" -n 1920 -ngl 999 --ignore-eos |& tee llama_cpp_result.log
+./main -m /ggml_bins/GGML_BINARY_FILE -p "Please generate a very long story about wizard and technology, at least two thousand words" -n 1920 -ngl 999 --ignore-eos |& tee llama_cpp_result.log
 ```
 
 ## TODOs
