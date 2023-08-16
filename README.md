@@ -50,11 +50,11 @@ ssh root@0.0.0.0 -p $PORT
 micromamba activate python311
 
 cd $MLC_HOME
-python build.py \
-  --model /models/Llama-2-7b-chat-hf \  # Replace it with path to HuggingFace models
-  --target cuda \
-  --quantization q4f16_1 \
-  --artifact-path "./dist" \
+python build.py                       \
+  --model /models/Llama-2-7b-chat-hf  \  # Replace it with path to HuggingFace models
+  --target cuda                       \
+  --quantization q4f16_1              \
+  --artifact-path "./dist"            \
   --use-cache 0
 ```
 
@@ -77,39 +77,41 @@ TBD
 **Step 1**. Build Docker image
 
 ```bash
-docker build -t llm-perf-llama-cpp:v0.1 -f Dockerfile.cu121.llama.cpp .
+docker build -t llm-perf-llama-cpp:v0.1 -f Dockerfile.cu121.llama_cpp .
 ```
 
-**Step 2**. Fetch quantized GGML binaries and run Llama2 via llama.cpp. Log in to the docker container we created using the comamnd below:
+**Step 2**. Download the quantized GGML models and run Llama2 via llama.cpp.
+
+To obtain the quantized GGML model, it is recommended to download it from
+[this](https://huggingface.co/TheBloke/Llama-2-7B-GGML/tree/main) HuggingFace repo.
+We use `llama-2-7b.ggmlv3.q4_K_M.bin` for benchmarking.
+
+Place the model into `GGML_BINS` and map it to a Docker volumn.
 
 ```bash
 PORT=41514
-GGML_BINS=/PATH/TO/GGML_BINS/
+GGML_BINS=/PATH/TO/GGML_BINS/  # Replace it with path to HuggingFace models
 
 docker run                  \
   -d -P                     \
   --gpus all                \
   -h llm-perf               \
-  --name llm-perf-llama.cpp \
+  --name llm-perf-llama-cpp \
   -p $PORT:22               \
   -v $GGML_BINS:/ggml_bins  \
   llm-perf-llama-cpp:v0.1
 
 # Password is: llm_perf
 ssh root@0.0.0.0 -p $PORT
-
-# Inside the container, run the following commands:
-micromamba activate python311
 ```
 
 **Step 3.** Run the CLI tool to see the performance numbers:
 
-GGML binary files are like `llama-2-7b.ggmlv3.q4_K_M.bin` or `llama-2-7b.ggmlv3.q4_0.bin`.
-You can download llama-2 7B GGML binary files from [here](https://huggingface.co/TheBloke/Llama-2-7B-GGML/tree/main).
+Log in to the docker container we created using the comamnd below:
 
 ```bash
 cd $LLAMA_CPP_HOME
-./build/bin/main -m /ggml_bins/GGML_BINARY_FILE -p "Please generate a very long story about wizard and technology, at least two thousand words" -n 1920 -ngl 999 --ignore-eos |& tee llama_cpp_result.log
+./build/bin/main -m /ggml_bins/llama-2-7b.ggmlv3.q4_K_M.bin -p "Please generate a very long story about wizard and technology, at least two thousand words" -n 1920 -ngl 999 --ignore-eos |& tee llama_cpp_result.log
 ```
 
 ## TODOs
