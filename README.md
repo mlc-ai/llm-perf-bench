@@ -82,11 +82,13 @@ docker build -t llm-perf-llama-cpp:v0.1 -f Dockerfile.cu121.llama_cpp .
 
 **Step 2**. Download the quantized GGML models and run Llama2 via llama.cpp.
 
-To obtain the quantized GGML model, it is recommended to download it from
-[this](https://huggingface.co/TheBloke/Llama-2-7B-GGML/tree/main) HuggingFace repo.
-We use `llama-2-7b.ggmlv3.q4_K_M.bin` for benchmarking.
+To obtain the quantized GGML model, it is recommended to download it via HuggingFace using
+the comamnd below:
 
-Place the model into `GGML_BINS` and map it to a Docker volumn.
+```bash
+wget https://huggingface.co/TheBloke/Llama-2-7B-GGML/resolve/main/llama-2-7b.ggmlv3.q4_K_M.bin
+wget https://huggingface.co/TheBloke/Llama-2-13B-GGML/resolve/main/llama-2-13b.ggmlv3.q4_K_M.bin
+```
 
 ```bash
 PORT=41514
