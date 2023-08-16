@@ -3,12 +3,14 @@ LLM Performance Benchmarking
 
 ## Performance
 
-| Model      | GPU         | MLC LLM (tok/sec) | Exllama (tok/sec) |
-|------------|-------------|-------------------|-------------------|
-| Llama2-7B  | RTX 3090 Ti | 166.7             | 112.72            |
-| Llama2-13B | RTX 3090 Ti | 99.2              | 69.31             |
-| Llama2-7B  | RTX 4090    | 191.0             | 152.56            |
-| Llama2-13B | RTX 4090    | 108.8             | 93.88             |
+| Model      | GPU         | MLC LLM (tok/sec) | Exllama (tok/sec) | Llama.cpp (tok/sec) |
+|------------|-------------|-------------------|-------------------|---------------------|
+| Llama2-7B  | RTX 3090 Ti | 166.7             | 112.72            | 113.34              |
+| Llama2-13B | RTX 3090 Ti | 99.2              | 69.31             | 71.34               |
+| Llama2-7B  | RTX 4090    | 191.0             | 152.56            | 50.13               |
+| Llama2-13B | RTX 4090    | 108.8             | 93.88             | 36.81               |
+
+All experiments are based on int4-quantized weights, fp16 activation and compute.
 
 Commit:
 - MLC LLM [commit](https://github.com/mlc-ai/mlc-llm/commit/502f6808b8073b87e561817a5a80b50810ab47be), TVM [commit](https://github.com/apache/tvm/commit/543838303b4289bb5669688efb9f88b15ddc2ebe);
