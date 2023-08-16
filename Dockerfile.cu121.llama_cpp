@@ -1,0 +1,30 @@
+# NOTE: This Dockerfile is based on CUDA 12.1.
+# To benchmark on other CUDA versions, search and replace "12.1" and "121".
+FROM nvidia/cuda:12.1.0-devel-ubuntu22.04
+
+SHELL ["/bin/bash", "-ec"]
+
+# Step 1. Set up Ubuntu
+RUN grep -v '[ -z "\$PS1" ] && return' ~/.bashrc >/tmp/bashrc                 && \
+    mv /tmp/bashrc ~/.bashrc                                                  && \
+    echo "export LLAMA_CPP_HOME=/llama.cpp/" >>~/.bashrc                      && \
+    echo "export PATH=/usr/local/cuda/bin/:\$PATH" >>~/.bashrc                && \
+    apt update                                                                && \
+    apt install --yes wget curl git vim build-essential openssh-server cmake
+
+# Step 2. Git clone and compile llama.cpp with cuBLAS
+# NOTE: You may have to tweak `CMAKE_CUDA_ARCHITECTURES`
+# to better accomodate your GPU architecture. It does not usually contribute
+# to performance different though according to our experiments.
+RUN git clone https://github.com/ggerganov/llama.cpp.git $LLAMA_CPP_HOME  && \
+    cd llama.cpp                                                          && \
+    git checkout f3c3b4b1672d860800639c87d3b5d17564692469                 && \
+    mkdir build && cd build                                               && \
+    cmake .. -DLLAMA_CUBLAS=1 && make -j$(nproc)
+
+# Step 4. Set up SSH
+COPY install/ssh.sh /install/ssh.sh
+RUN bash /install/ssh.sh
+WORKDIR /root
+EXPOSE 22
+CMD ["/usr/sbin/sshd", "-D"]

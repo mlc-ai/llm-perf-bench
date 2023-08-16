@@ -3,16 +3,19 @@ LLM Performance Benchmarking
 
 ## Performance
 
-| Model      | GPU         | MLC LLM (tok/sec) | Exllama (tok/sec) |
-|------------|-------------|-------------------|-------------------|
-| Llama2-7B  | RTX 3090 Ti | 166.7             | 112.72            |
-| Llama2-13B | RTX 3090 Ti | 99.2              | 69.31             |
-| Llama2-7B  | RTX 4090    | 191.0             | 152.56            |
-| Llama2-13B | RTX 4090    | 108.8             | 93.88             |
+| Model      | GPU         | MLC LLM (tok/sec) | Exllama (tok/sec) | Llama.cpp (tok/sec) |
+|------------|-------------|-------------------|-------------------|---------------------|
+| Llama2-7B  | RTX 3090 Ti | 166.7             | 112.72            | 113.34              |
+| Llama2-13B | RTX 3090 Ti | 99.2              | 69.31             | 71.34               |
+| Llama2-7B  | RTX 4090    | 191.0             | 152.56            | 50.13               |
+| Llama2-13B | RTX 4090    | 108.8             | 93.88             | 36.81               |
+
+All experiments are based on int4-quantized weights, fp16 activation and compute.
 
 Commit:
 - MLC LLM [commit](https://github.com/mlc-ai/mlc-llm/commit/502f6808b8073b87e561817a5a80b50810ab47be), TVM [commit](https://github.com/apache/tvm/commit/543838303b4289bb5669688efb9f88b15ddc2ebe);
 - Exllama [commit](https://github.com/turboderp/exllama/commit/c16cf49c3f19e887da31d671a713619c8626484e).
+- Llama.cpp: [commit](https://github.com/ggerganov/llama.cpp/commit/f3c3b4b1672d860800639c87d3b5d17564692469)
 
 
 ## Instructions
@@ -49,11 +52,11 @@ ssh root@0.0.0.0 -p $PORT
 micromamba activate python311
 
 cd $MLC_HOME
-python build.py \
-  --model /models/Llama-2-7b-chat-hf \  # Replace it with path to HuggingFace models
-  --target cuda \
-  --quantization q4f16_1 \
-  --artifact-path "./dist" \
+python build.py                       \
+  --model /models/Llama-2-7b-chat-hf  \  # Replace it with path to HuggingFace models
+  --target cuda                       \
+  --quantization q4f16_1              \
+  --artifact-path "./dist"            \
   --use-cache 0
 ```
 
@@ -73,7 +76,47 @@ TBD
 
 ### Llama.cpp
 
-TBD
+**Step 1**. Build Docker image
+
+```bash
+docker build -t llm-perf-llama-cpp:v0.1 -f Dockerfile.cu121.llama_cpp .
+```
+
+**Step 2**. Download the quantized GGML models and run Llama2 via llama.cpp.
+
+To obtain the quantized GGML model, it is recommended to download it via HuggingFace using
+the comamnd below:
+
+```bash
+wget https://huggingface.co/TheBloke/Llama-2-7B-GGML/resolve/main/llama-2-7b.ggmlv3.q4_K_M.bin
+wget https://huggingface.co/TheBloke/Llama-2-13B-GGML/resolve/main/llama-2-13b.ggmlv3.q4_K_M.bin
+```
+
+```bash
+PORT=41514
+GGML_BINS=/PATH/TO/GGML_BINS/  # Replace it with path to HuggingFace models
+
+docker run                  \
+  -d -P                     \
+  --gpus all                \
+  -h llm-perf               \
+  --name llm-perf-llama-cpp \
+  -p $PORT:22               \
+  -v $GGML_BINS:/ggml_bins  \
+  llm-perf-llama-cpp:v0.1
+
+# Password is: llm_perf
+ssh root@0.0.0.0 -p $PORT
+```
+
+**Step 3.** Run the CLI tool to see the performance numbers:
+
+Log in to the docker container we created using the comamnd below:
+
+```bash
+cd $LLAMA_CPP_HOME
+./build/bin/main -m /ggml_bins/llama-2-7b.ggmlv3.q4_K_M.bin -p "Please generate a very long story about wizard and technology, at least two thousand words" -n 128 -ngl 999 --ignore-eos
+```
 
 ## TODOs
 
