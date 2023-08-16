@@ -113,7 +113,7 @@ Log in to the docker container we created using the comamnd below:
 
 ```bash
 cd $LLAMA_CPP_HOME
-./build/bin/main -m /ggml_bins/llama-2-7b.ggmlv3.q4_K_M.bin -p "Please generate a very long story about wizard and technology, at least two thousand words" -n 1920 -ngl 999 --ignore-eos |& tee llama_cpp_result.log
+./build/bin/main -m /ggml_bins/llama-2-7b.ggmlv3.q4_K_M.bin -p "Please generate a very long story about wizard and technology, at least two thousand words" -n 128 -ngl 999 --ignore-eos
 ```
 
 ## TODOs
