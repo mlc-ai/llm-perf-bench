@@ -62,13 +62,9 @@ python build.py                       \
 
 The quantized and compiled model will be exported to `./dist/Llama-2-7b-chat-hf-q4f16_1`.
 
-**Step 3.** Run the CLI tool to see the performance numbers:
+**Step 3.** Run the Python bechmarking scripts according to "examples/python
+/benchmark.py".
 
-```bash
-$MLC_HOME/build/mlc_chat_cli \
-  --model Llama-2-7b-chat-hf \
-  --quantization q4f16_1
-```
 
 ### Exllama
 
