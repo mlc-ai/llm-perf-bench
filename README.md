@@ -114,6 +114,45 @@ cd $LLAMA_CPP_HOME
 ./build/bin/main -m /ggml_bins/llama-2-7b.ggmlv3.q4_K_M.bin -p "Please generate a very long story about wizard and technology, at least two thousand words" -n 128 -ngl 999 --ignore-eos
 ```
 
+### Huggingface
+
+**Step 1**. Build Docker image
+
+```bash
+docker build -t llm-perf-hf:v0.1 -f Dockerfile.cu121.disco.hf .
+```
+
+**Step 2**. Download the quantized GGML models and run Llama2 via script.
+
+Download Llama-2-70b-hf weight from [huggingface](https://huggingface.co/meta-llama/Llama-2-70b-hf).
+
+```bash
+PORT=41598
+MODEL_WEIGHTS=/PATH/TO/Llama-2-70b-hf/  # Replace it with path to HuggingFace models
+
+docker run                   \
+  -d -P                      \
+  --gpus all                 \
+  -h llm-perf                \
+  --name llm-perf-hf         \
+  -p $PORT:22                \
+  -v $MODEL_WEIGHTS:/models  \
+  llm-perf-hf:v0.1
+
+# Password is: llm_perf
+ssh root@0.0.0.0 -p $PORT
+```
+
+**Step 3.** Run the python script to see the performance numbers:
+
+Log in to the docker container we created using the comamnd below:
+
+```bash
+micromamba activate python311
+python benchmark_hf.py --model-path /models/Llama-2-70b-hf --format q0f16
+python benchmark_hf.py --model-path /models/Llama-2-70b-hf --format q4f16
+```
+
 ## TODOs
 
 Only decoding performance is currently benchmarked given prefilling usually takes much shorter time with flash attention.
