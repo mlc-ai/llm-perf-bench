@@ -157,7 +157,7 @@ wget -O ./llama_cpp_models/llama-2-7b.Q4_K_M.gguf https://huggingface.co/TheBlok
 
 </details>
 
-**Step 3**. Log into docker, and the CLI tool to see the performance numbers. Note that modify `CUDA_VISIBLE_DEVICES`` settings for different numbers of GPUs experiments.
+**Step 3**. Log into docker, and the CLI tool to see the performance numbers. Note that modify `CUDA_VISIBLE_DEVICES` settings for different numbers of GPUs experiments.
 
 <details>
 
