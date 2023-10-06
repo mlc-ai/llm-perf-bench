@@ -17,13 +17,13 @@ RUN apt update                                                                  
 # to better accomodate your GPU architecture. It does not usually contribute
 # to performance different though according to our experiments.
 RUN git clone https://github.com/ggerganov/llama.cpp.git /llama.cpp                         && \
-    cd llama.cpp                                                                            && \
+    cd /llama.cpp                                                                            && \
     git checkout 9476b012260a2fb6c67976582d64484ce7406ed9                                   && \
     mkdir build && cd build                                                                 && \
     cmake .. -DLLAMA_CUBLAS=1 -DLLAMA_CUDA_MMV_Y=2 -DLLAMA_CUDA_F16=1 && make -j$(nproc)
 
 # Step 3. Set up python
-RUN cd llama.cpp  && \
+RUN cd /llama.cpp  && \
     bash <(curl -L micro.mamba.pm/install.sh) && source ~/.bashrc                           && \
     micromamba create --yes -n python311 -c conda-forge                                        \
     python=3.11                                                                             && \
