@@ -21,10 +21,3 @@ RUN bash <(curl -L micro.mamba.pm/install.sh) && source ~/.bashrc               
 
 # Step 3. Copy the benchmark script
 COPY benchmark_hf.py /root/benchmark_hf.py
-
-# Step 4. Set up SSH and clean up
-COPY install/ssh.sh /install/ssh.sh
-RUN bash /install/ssh.sh
-WORKDIR /root
-EXPOSE 22
-CMD ["/usr/sbin/sshd", "-D"]

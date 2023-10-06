@@ -267,6 +267,7 @@ CUDA_VISIBLE_DEVICES=0,1 ./build/bin/main -m /workspace/llama_cpp_models/llama-2
 
 ```bash
 cd /llama.cpp
+conda activate python311
 # convert the weight using llama.cpp script
 python3 convert.py /path/to/Llama-2-70b-hf/ --outfile /workspace/llama_cpp_models/llama-2-70b.fp16.gguf
 # run fp16 models on 4 GPUs.
