@@ -217,9 +217,45 @@ python -m mlc_chat.cli.benchmark \
 
 </details>
 
-### Exllama
+### Exllama V2
 
-TBD
+In this section, we use Llama2 GPTQ model as an example.
+
+**Step 1**. Build Docker image and download pre-quantized weights from HuggingFace, then log into the docker image and activate Python environment:
+
+```bash
+git lfs install
+git clone https://huggingface.co/TheBloke/Llama-2-70B-GPTQ
+docker build --no-cache -t llm-perf-exllama-v2:v0.1    \
+    -f ./docker/Dockerfile.cu121.exllama_v2 .
+./docker/bash.sh llm-perf-exllama-v2:v0.1
+conda activate python311
+```
+
+**Step 2**. Stay logged in, set some basic environment variables for convenient scripting.
+</details>
+
+**Step 2**. Stay logged in, run benchmarking
+
+<details>
+
+For single GPU:
+```bash
+MODEL_PATH=$(pwd)/Llama-2-70B-GGML/
+OUTPUT_LEN=250
+cd exllamav2
+python test_inference.py -m $MODEL_PATH -p "What is the meaning of life?" -t $OUTPUT_LEN
+```
+
+For Multiple GPU:
+```bash
+MODEL_PATH=$(pwd)/Llama-2-70B-GGML/
+OUTPUT_LEN=250
+GPU_SPLIT="17,17" # depend on how you want to split memory
+cd exllamav2
+python test_inference.py -m $MODEL_PATH -p "What is the meaning of life?" -gs $GPU_SPLIT -t $OUTPUT_LEN
+```
+</details>
 
 ### Llama.cpp
 
@@ -280,5 +316,5 @@ CUDA_VISIBLE_DEVICES=0,1,2,3 ./build/bin/main -m /workspace/llama-2-70b.fp16.ggu
 
 We are using the following commits:
 - MLC LLM [commit](https://github.com/mlc-ai/mlc-llm/commit/8e94910ec7967cbe749dbf04713f96a52cccbc19), TVM [commit](https://github.com/mlc-ai/relax/commits/e5ca38dd735ba4d30782a4a58bf6195861642eb0);
-- Exllama [commit](https://github.com/turboderp/exllama/commit/c16cf49c3f19e887da31d671a713619c8626484e).
+- ExllamaV2 [commit](https://github.com/turboderp/exllamav2/commit/9d6fdb952f6705f79415364e9d85989dcda01478).
 - Llama.cpp: [commit](https://github.com/ggerganov/llama.cpp/commit/9476b012260a2fb6c67976582d64484ce7406ed9)
