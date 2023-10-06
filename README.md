@@ -35,6 +35,9 @@ docker build -t llm-perf-mlc:v0.1 -f ./docker/Dockerfile.cu121.mlc .
 git clone https://huggingface.co/mlc-ai/mlc-chat-Llama-2-7b-chat-hf-q4f16_1
 git clone https://huggingface.co/mlc-ai/mlc-chat-Llama-2-13b-chat-hf-q4f16_1
 git clone https://huggingface.co/mlc-ai/mlc-chat-Llama-2-70b-chat-hf-q4f16_1
+git clone https://huggingface.co/mlc-ai/mlc-chat-CodeLlama-7b-Instruct-hf-q4f16_1
+git clone https://huggingface.co/mlc-ai/mlc-chat-CodeLlama-13b-Instruct-hf-q4f16_1
+git clone https://huggingface.co/mlc-ai/mlc-chat-CodeLlama-34b-Instruct-hf-q4f16_1
 ```
 
 </details>
@@ -48,13 +51,14 @@ git clone https://huggingface.co/mlc-ai/mlc-chat-Llama-2-70b-chat-hf-q4f16_1
 
 conda activate python311
 
-MODEL_CONFIG=./model_configs/llama2_7b.json
-QUANTIZATION=q4f16_1
 MODEL_NAME=Llama-2-7b-chat-hf
+QUANTIZATION=q4f16_1
 NUM_SHARDS=1
-WEIGHT_PATH=$(pwd)/mlc-chat-${MODEL_NAME}-${QUANTIZATION}/
 PATH_COMPILE=/tmp/model/
 PATH_TEST=/tmp/test/
+
+MODEL_CONFIG=./model_configs/${MODEL_NAME}.json
+WEIGHT_PATH=$(pwd)/mlc-chat-${MODEL_NAME}-${QUANTIZATION}/
 
 if [ -e "$WEIGHT_PATH/mlc-chat-config.json" ]; then
 	sed -i "/\"num_shards\"/c\ \"num_shards\": ${NUM_SHARDS}," $WEIGHT_PATH/mlc-chat-config.json
@@ -63,9 +67,7 @@ else
 	exit
 fi
 
-rm -rf $PATH_TEST && mkdir $PATH_TEST && rm -rf $PATH_COMPILE && mkdir $PATH_COMPILE
-ln -s ${WEIGHT_PATH} ${PATH_TEST}/params
-cp $MODEL_CONFIG $PATH_COMPILE/config.json
+rm -rf $PATH_TEST && mkdir $PATH_TEST && rm -rf $PATH_COMPILE && mkdir $PATH_COMPILE && ln -s ${WEIGHT_PATH} ${PATH_TEST}/params && cp $MODEL_CONFIG $PATH_COMPILE/config.json
 ```
 
 </details>
