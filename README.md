@@ -67,16 +67,23 @@ git clone https://huggingface.co/mlc-ai/mlc-chat-Llama-2-7b-chat-hf-q4f16_1
 
 </details>
 
-**Step 2**. Log into docker, activate Python environment, and set some basic environment variables for convenient scripting.
+Then log into the docker image and activate Python environment:
 
 <details>
 
 ```bash
 ./docker/bash.sh llm-perf-mlc:v0.1
 # ./docker/bash.sh --amd llm-perf-mlc:v0.1
-
 conda activate python311
+```
 
+</details>
+
+**Step 2**. Stay logged in, set some basic environment variables for convenient scripting.
+
+<details>
+
+```bash
 MODEL_NAME=Llama-2-7b-chat-hf
 QUANTIZATION=q4f16_1
 NUM_SHARDS=1
