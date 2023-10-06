@@ -7,10 +7,10 @@ LLM Performance Benchmarking
 
 | Model      | GPU         | MLC LLM (tok/sec) | Exllama (tok/sec) | Llama.cpp (tok/sec) |
 |------------|-------------|-------------------|-------------------|---------------------|
-| Llama2-7B  | RTX 3090 Ti | 186.7             | 112.72            | 113.34              |
-| Llama2-13B | RTX 3090 Ti | 107.4             | 69.31             | 71.34               |
-| Llama2-7B  | RTX 4090    | 204.8             | 152.56            | 50.13               |
-| Llama2-13B | RTX 4090    | 113.5             | 93.88             | 36.81               |
+| Llama2-7B  | RTX 3090 Ti | 186.7             | 112.72            | 134.54              |
+| Llama2-13B | RTX 3090 Ti | 107.4             | 69.31             | 81.48               |
+| Llama2-7B  | RTX 4090    | 204.8             | 152.56            | 151.1               |
+| Llama2-13B | RTX 4090    | 113.5             | 93.88             | 88.0                |
 
 All experiments are based on int4-quantized weights, fp16 activation and compute, decoding for 256 tokens with a prompt "What is the meaning of life?".
 
@@ -223,11 +223,62 @@ TBD
 
 ### Llama.cpp
 
-TBD
+**Step 1**. Build Docker image:
+
+<details>
+
+```bash
+docker build -t llm-perf-llama-cpp:v0.1 -f ./docker/Dockerfile.cu121.llama_cpp .
+```
+
+</details>
+
+**Step 2**. Download the quantized GGML models from HuggingFace:
+
+<details>
+
+```bash
+mkdir -p ./llama_cpp_models
+wget -O ./llama_cpp_models/llama-2-7b.Q4_K_M.gguf https://huggingface.co/TheBloke/Llama-2-7B-GGUF/resolve/main/llama-2-7b.Q4_K_M.gguf 
+# wget -O ./llama_cpp_models/llama-2-13b.Q4_K_M.gguf https://huggingface.co/TheBloke/Llama-2-13B-GGUF/resolve/main/llama-2-13b.Q4_K_M.gguf
+# wget -O ./llama_cpp_models/llama-2-70b.Q4_K_M.gguf https://huggingface.co/TheBloke/Llama-2-70B-GGUF/resolve/main/llama-2-70b.Q4_K_M.gguf
+```
+
+</details>
+
+**Step 3**. Log into docker, and the CLI tool to see the performance numbers. Note that modify `CUDA_VISIBLE_DEVICES` settings for different numbers of GPUs experiments.
+
+<details>
+
+```bash
+./docker/bash.sh llm-perf-llama-cpp:v0.1
+cd /llama.cpp
+# run quantized models on a single GPU.
+CUDA_VISIBLE_DEVICES=0 ./build/bin/main -m /workspace/llama_cpp_models/llama-2-7b.Q4_K_M.gguf -p "What is the meaning of life?" -n 256 -ngl 999 --ignore-eos
+# test quantized 70B models on 2 GPUS.
+CUDA_VISIBLE_DEVICES=0,1 ./build/bin/main -m /workspace/llama_cpp_models/llama-2-70b.Q4_K_M.gguf -p "What is the meaning of life?" -n 256 -ngl 999 --ignore-eos
+```
+
+</details>
+
+**Note**. For float16 models, stay logged in and convert the hf models(download [here](https://huggingface.co/meta-llama/Llama-2-70b-hf)) to GGUF FP16 format first.
+
+<details>
+
+```bash
+cd /llama.cpp
+conda activate python311
+# convert the weight using llama.cpp script
+python3 convert.py /path/to/Llama-2-70b-hf/ --outfile /workspace/llama_cpp_models/llama-2-70b.fp16.gguf
+# run fp16 models on 4 GPUs.
+CUDA_VISIBLE_DEVICES=0,1,2,3 ./build/bin/main -m /workspace/llama-2-70b.fp16.gguf -p "What is the meaning of life?" -n 256 -ngl 999 --ignore-eos
+```
+
+</details>
 
 ## Setup Details
 
 We are using the following commits:
 - MLC LLM [commit](https://github.com/mlc-ai/mlc-llm/commit/8e94910ec7967cbe749dbf04713f96a52cccbc19), TVM [commit](https://github.com/mlc-ai/relax/commits/e5ca38dd735ba4d30782a4a58bf6195861642eb0);
 - Exllama [commit](https://github.com/turboderp/exllama/commit/c16cf49c3f19e887da31d671a713619c8626484e).
-- Llama.cpp: [commit](https://github.com/ggerganov/llama.cpp/commit/f3c3b4b1672d860800639c87d3b5d17564692469)
+- Llama.cpp: [commit](https://github.com/ggerganov/llama.cpp/commit/9476b012260a2fb6c67976582d64484ce7406ed9)
