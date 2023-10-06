@@ -5,12 +5,12 @@ FROM nvidia/cuda:12.1.0-devel-ubuntu22.04
 SHELL ["/bin/bash", "-ec"]
 
 # Step 1. Set up Ubuntu
-RUN grep -v '[ -z "\$PS1" ] && return' ~/.bashrc >/tmp/bashrc                                               && \
-    mv /tmp/bashrc ~/.bashrc                                                                                && \
-    echo "export HF_HOME=/hf/" >>~/.bashrc                                                                  && \
-    echo "export PATH=/usr/local/cuda/bin/:\$PATH" >>~/.bashrc                                              && \
-    apt update                                                                                              && \
-    apt install --yes wget curl git vim build-essential openssh-server
+RUN grep -v '[ -z "\$PS1" ] && return' ~/.bashrc >/tmp/bashrc                               && \
+    echo "alias conda=micromamba" >>/tmp/bashrc                                             && \
+    mv /tmp/bashrc ~/.bashrc
+
+RUN apt update                                                                              && \
+    apt install --yes wget curl git vim build-essential openssh-server cmake
 
 # Step 2. Set up python
 RUN bash <(curl -L micro.mamba.pm/install.sh) && source ~/.bashrc                                           && \
@@ -19,5 +19,3 @@ RUN bash <(curl -L micro.mamba.pm/install.sh) && source ~/.bashrc               
     micromamba activate python311                                                                           && \
     pip install transformers==4.33.3 torch==2.0.1 accelerate==0.23.0 bitsandbytes==0.41.1 scipy==1.11.3
 
-# Step 3. Copy the benchmark script
-COPY benchmark_hf.py /root/benchmark_hf.py

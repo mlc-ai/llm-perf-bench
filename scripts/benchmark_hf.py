@@ -42,7 +42,7 @@ class Timer:
 
 def create_fp16(model_id):
     model = AutoModelForCausalLM.from_pretrained(
-        model_id, device_map="auto", torch_dtype=torch.float16
+        model_id, device_map="auto", torch_dtype=torch.float16, use_safetensors=False
     )
     return model
 
@@ -53,7 +53,10 @@ def create_q4fp16(model_id):
     )
 
     model = AutoModelForCausalLM.from_pretrained(
-        model_id, quantization_config=quantization_config, device_map="auto"
+        model_id,
+        quantization_config=quantization_config,
+        device_map="auto",
+        use_safetensors=False,
     )
     return model
 
@@ -118,9 +121,10 @@ def main(ARGS):
     model_id = ARGS.model_path
     max_new_tokens = ARGS.max_new_tokens
     quantize = ARGS.format
+    prompt = ARGS.prompt
 
     print(
-        f"Using model from {model_id}, max_new_tokens = {max_new_tokens}, format = {quantize}"
+        f"Using model from {model_id}, max_new_tokens = {max_new_tokens}, format = {quantize}, prompt = {prompt}"
     )
 
     tokenizer = AutoTokenizer.from_pretrained(model_id)
@@ -132,7 +136,7 @@ def main(ARGS):
     else:
         assert False
 
-    input_text = "Please generate a very long story about wizard and technology, at least two thousand words"
+    input_text = prompt
     inputs = tokenizer(input_text, return_tensors="pt").to("cuda")
 
     recorder = Recorder()
@@ -147,8 +151,10 @@ def main(ARGS):
     decode_elapsed_time, decode_num = recorder.get("decode")
     assert decode_num == max_new_tokens - 1
 
+    print("=" * 10)
     print(log_perf("prefill", prefill_elapsed_time, inputs["input_ids"].shape[-1]))
     print(log_perf("decode", decode_elapsed_time, decode_num))
+    print("=" * 10)
 
     print(tokenizer.decode(outputs[0], skip_special_tokens=True))
 
@@ -157,7 +163,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--model-path")
     parser.add_argument("--format", choices=["q0f16", "q4f16"])
-    parser.add_argument("--max-new-tokens", type=int, default=128)
+    parser.add_argument("--max-new-tokens", type=int)
+    parser.add_argument("--prompt", type=str)
 
     ARGS = parser.parse_args()
     main(ARGS)

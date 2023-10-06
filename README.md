@@ -303,9 +303,9 @@ wget -O ./llama_cpp_models/llama-2-7b.Q4_K_M.gguf https://huggingface.co/TheBlok
 ```bash
 ./docker/bash.sh llm-perf-llama-cpp:v0.1
 cd /llama.cpp
-# run quantized models on a single GPU.
+# run quantized Llama-2-7B models on a single GPU.
 CUDA_VISIBLE_DEVICES=0 ./build/bin/main -m /workspace/llama_cpp_models/llama-2-7b.Q4_K_M.gguf -p "What is the meaning of life?" -n 256 -ngl 999 --ignore-eos
-# test quantized 70B models on 2 GPUS.
+# test quantized Llama-2-70B models on 2 GPUS.
 CUDA_VISIBLE_DEVICES=0,1 ./build/bin/main -m /workspace/llama_cpp_models/llama-2-70b.Q4_K_M.gguf -p "What is the meaning of life?" -n 256 -ngl 999 --ignore-eos
 ```
 
@@ -322,7 +322,46 @@ conda activate python311
 python3 convert.py /path/to/Llama-2-70b-hf/ \
     --outfile /workspace/llama_cpp_models/llama-2-70b.fp16.gguf
 # run fp16 models on 4 GPUs.
-CUDA_VISIBLE_DEVICES=0,1,2,3 ./build/bin/main -m /workspace/llama-2-70b.fp16.gguf -p "What is the meaning of life?" -n 256 -ngl 999 --ignore-eos
+CUDA_VISIBLE_DEVICES=0,1,2,3 ./build/bin/main -m /workspace/llama_cpp_models/llama-2-70b.fp16.gguf -p "What is the meaning of life?" -n 256 -ngl 999 --ignore-eos
+```
+
+</details>
+
+### HuggingFace
+**Step 1**. Build Docker image:
+
+<details>
+
+```bash
+docker build -t llm-perf-hf:v0.1 -f ./docker/Dockerfile.cu121.hf .
+```
+
+</details>
+
+**Step 2**. Download Llama-2 weight from [huggingface](https://huggingface.co/meta-llama/Llama-2-70b-hf).
+
+<details>
+
+```bash
+git lfs install
+git clone https://huggingface.co/meta-llama/Llama-2-7b-hf
+# git clone https://huggingface.co/meta-llama/Llama-2-13b-hf
+# git clone https://huggingface.co/meta-llama/Llama-2-70b-hf
+```
+
+</details>
+
+**Step 3**. Log into docker and run the python script to see the performance numbers. Note that modify `CUDA_VISIBLE_DEVICES` settings for different numbers of GPUs experiments.:
+
+<details>
+
+```bash
+./docker/bash.sh llm-perf-hf:v0.1
+conda activate python311
+# run fp16 Llama-2-7b models on a single GPU.
+CUDA_VISIBLE_DEVICES=0 python scripts/benchmark_hf.py --model-path ./Llama-2-7b-hf --format q0f16 --prompt "What is the meaning of life?" --max-new-tokens 256
+# run int 4 quantized Llama-2-70b model on two GPUs.
+CUDA_VISIBLE_DEVICES=0,1 python scripts/benchmark_hf.py --model-path ./Llama-2-70b-hf --format q4f16 --prompt "What is the meaning of life?" --max-new-tokens 256
 ```
 
 </details>
