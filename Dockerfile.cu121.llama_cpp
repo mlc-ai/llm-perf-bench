@@ -16,11 +16,19 @@ RUN grep -v '[ -z "\$PS1" ] && return' ~/.bashrc >/tmp/bashrc                 &&
 # NOTE: You may have to tweak `CMAKE_CUDA_ARCHITECTURES`
 # to better accomodate your GPU architecture. It does not usually contribute
 # to performance different though according to our experiments.
-RUN git clone https://github.com/ggerganov/llama.cpp.git $LLAMA_CPP_HOME  && \
-    cd llama.cpp                                                          && \
-    git checkout f3c3b4b1672d860800639c87d3b5d17564692469                 && \
-    mkdir build && cd build                                               && \
+RUN git clone https://github.com/ggerganov/llama.cpp.git $LLAMA_CPP_HOME      && \
+    cd llama.cpp                                                              && \
+    git checkout 9476b012260a2fb6c67976582d64484ce7406ed9                     && \
+    mkdir build && cd build                                                   && \
     cmake .. -DLLAMA_CUBLAS=1 && make -j$(nproc)
+
+# Step 3. Set up python
+RUN cd llama.cpp  && \
+    bash <(curl -L micro.mamba.pm/install.sh) && source ~/.bashrc             && \
+    micromamba create --yes -n python311 -c conda-forge                          \
+    python=3.11                                                               && \
+    micromamba activate python311                                             && \
+    python3 -m pip install -r requirements.txt
 
 # Step 4. Set up SSH
 COPY install/ssh.sh /install/ssh.sh

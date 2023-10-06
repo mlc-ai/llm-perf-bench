@@ -30,7 +30,7 @@ First of all, NVIDIA Docker is required: https://docs.nvidia.com/datacenter/clou
 docker build -t llm-perf-mlc:v0.1 -f Dockerfile.cu121.mlc .
 ```
 
-**Step 2**. Quantize and run Llama2. Log in to the docker container we created using the comamnd below:
+**Step 2**. Quantize and run Llama2. Log in to the docker container we created using the command below:
 
 ```bash
 PORT=45678
@@ -80,17 +80,20 @@ docker build -t llm-perf-llama-cpp:v0.1 -f Dockerfile.cu121.llama_cpp .
 
 **Step 2**. Download the quantized GGML models and run Llama2 via llama.cpp.
 
-To obtain the quantized GGML model, it is recommended to download it via HuggingFace using
-the comamnd below:
+To obtain the quantized GGUF model, it is recommended to download it via HuggingFace using
+the command below:
 
 ```bash
-wget https://huggingface.co/TheBloke/Llama-2-7B-GGML/resolve/main/llama-2-7b.ggmlv3.q4_K_M.bin
-wget https://huggingface.co/TheBloke/Llama-2-13B-GGML/resolve/main/llama-2-13b.ggmlv3.q4_K_M.bin
+wget -O /PATH/TO/MODELS/llama-2-7b.Q4_K_M.gguf https://huggingface.co/TheBloke/Llama-2-7B-GGUF/resolve/main/llama-2-7b.Q4_K_M.gguf 
+wget -O /PATH/TO/MODELS/llama-2-13b.Q4_K_M.gguf https://huggingface.co/TheBloke/Llama-2-13B-GGUF/resolve/main/llama-2-13b.Q4_K_M.gguf
+wget -O /PATH/TO/MODELS/llama-2-70b.Q4_K_M.gguf https://huggingface.co/TheBloke/Llama-2-70B-GGUF/resolve/main/llama-2-70b.Q4_K_M.gguf
 ```
+
+To test on float16 format, download Llama-2-70b-hf weight from [huggingface](https://huggingface.co/meta-llama/Llama-2-70b-hf), and place the model folder under your `/PATH/TO/MODELS`.
 
 ```bash
 PORT=41514
-GGML_BINS=/PATH/TO/GGML_BINS/  # Replace it with path to HuggingFace models
+MODEL_PATH=/PATH/TO/MODELS/  # Replace this with the path to the directory containing the HuggingFace model
 
 docker run                  \
   -d -P                     \
@@ -98,7 +101,7 @@ docker run                  \
   -h llm-perf               \
   --name llm-perf-llama-cpp \
   -p $PORT:22               \
-  -v $GGML_BINS:/ggml_bins  \
+  -v $MODEL_PATH:/models  \
   llm-perf-llama-cpp:v0.1
 
 # Password is: llm_perf
@@ -107,22 +110,33 @@ ssh root@0.0.0.0 -p $PORT
 
 **Step 3.** Run the CLI tool to see the performance numbers:
 
-Log in to the docker container we created using the comamnd below:
+Log in to the docker container we created using the command below:
 
 ```bash
 cd $LLAMA_CPP_HOME
-./build/bin/main -m /ggml_bins/llama-2-7b.ggmlv3.q4_K_M.bin -p "Please generate a very long story about wizard and technology, at least two thousand words" -n 128 -ngl 999 --ignore-eos
+# run quantized models
+CUDA_VISIBLE_DEVICES=0 ./build/bin/main -m /models/llama-2-7b.Q4_K_M.gguf -p "Please generate a very long story about wizard and technology, at least two thousand words" -n 128 -ngl 999 --ignore-eos
+# test quantized 70B models on 2 gpus
+CUDA_VISIBLE_DEVICES=0,1 ./build/bin/main -m /models/llama-2-70b.Q4_K_M.gguf -p "Please generate a very long story about wizard and technology, at least two thousand words" -n 128 -ngl 999 --ignore-eos
 ```
 
-### Huggingface
+To evaluate the performance of the float16 model, please convert the 70B model to GGUF FP16 format first.
+```bash
+cd $LLAMA_CPP_HOME
+python3 convert.py /models/Llama-2-70b-hf/ --outfile /models/llama-2-70b.fp16.gguf
+CUDA_VISIBLE_DEVICES=0,1,2,3 ./build/bin/main -m /models/llama-2-70b.fp16.gguf -p "Please generate a very long story about wizard and technology, at least two thousand words" -n 128 -ngl 999 --ignore-eos
+```
+
+
+### HuggingFace
 
 **Step 1**. Build Docker image
 
 ```bash
-docker build -t llm-perf-hf:v0.1 -f Dockerfile.cu121.disco.hf .
+docker build -t llm-perf-hf:v0.1 -f Dockerfile.cu121.hf .
 ```
 
-**Step 2**. Download the quantized GGML models and run Llama2 via script.
+**Step 2**. Download the HuggingFace models and run Llama2 via script.
 
 Download Llama-2-70b-hf weight from [huggingface](https://huggingface.co/meta-llama/Llama-2-70b-hf).
 
@@ -145,11 +159,13 @@ ssh root@0.0.0.0 -p $PORT
 
 **Step 3.** Run the python script to see the performance numbers:
 
-Log in to the docker container we created using the comamnd below:
+Log in to the docker container we created using the command below:
 
 ```bash
 micromamba activate python311
+# test the float16 quantized model
 python benchmark_hf.py --model-path /models/Llama-2-70b-hf --format q0f16
+# test the 4-bit quantized model
 python benchmark_hf.py --model-path /models/Llama-2-70b-hf --format q4f16
 ```
 
