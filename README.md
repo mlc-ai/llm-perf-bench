@@ -3,19 +3,20 @@ LLM Performance Benchmarking
 
 ## Performance
 
+### Int4-quantized, Single GPU
+
 | Model      | GPU         | MLC LLM (tok/sec) | Exllama (tok/sec) | Llama.cpp (tok/sec) |
 |------------|-------------|-------------------|-------------------|---------------------|
-| Llama2-7B  | RTX 3090 Ti | 166.7             | 112.72            | 113.34              |
-| Llama2-13B | RTX 3090 Ti | 99.2              | 69.31             | 71.34               |
-| Llama2-7B  | RTX 4090    | 191.0             | 152.56            | 50.13               |
-| Llama2-13B | RTX 4090    | 108.8             | 93.88             | 36.81               |
+| Llama2-7B  | RTX 3090 Ti | 186.7             | 112.72            | 113.34              |
+| Llama2-13B | RTX 3090 Ti | 107.4             | 69.31             | 71.34               |
+| Llama2-7B  | RTX 4090    | 204.8             | 152.56            | 50.13               |
+| Llama2-13B | RTX 4090    | 113.5             | 93.88             | 36.81               |
 
-All experiments are based on int4-quantized weights, fp16 activation and compute.
+All experiments are based on int4-quantized weights, fp16 activation and compute, decoding for 256 tokens with a prompt "What is the meaning of life?".
 
-Commit:
-- MLC LLM [commit](https://github.com/mlc-ai/mlc-llm/commit/502f6808b8073b87e561817a5a80b50810ab47be), TVM [commit](https://github.com/apache/tvm/commit/543838303b4289bb5669688efb9f88b15ddc2ebe);
-- Exllama [commit](https://github.com/turboderp/exllama/commit/c16cf49c3f19e887da31d671a713619c8626484e).
-- Llama.cpp: [commit](https://github.com/ggerganov/llama.cpp/commit/f3c3b4b1672d860800639c87d3b5d17564692469)
+### FP16, Multi-GPU
+
+TBD
 
 ## Instructions
 
@@ -91,7 +92,6 @@ mv $PATH_COMPILE/model-${QUANTIZATION}/model-${QUANTIZATION}-cuda.so $PATH_TEST/
 <details>
 
 ```bash
-echo "benchmarking..."
 python -m mlc_chat.cli.benchmark \
 	--model ${PATH_TEST}/params \
 	--device "cuda:0" \
@@ -108,3 +108,10 @@ TBD
 ### Llama.cpp
 
 TBD
+
+## Setup Details
+
+We are using the following commits:
+- MLC LLM [commit](https://github.com/mlc-ai/mlc-llm/commit/8e94910ec7967cbe749dbf04713f96a52cccbc19), TVM [commit](https://github.com/mlc-ai/relax/commits/e5ca38dd735ba4d30782a4a58bf6195861642eb0);
+- Exllama [commit](https://github.com/turboderp/exllama/commit/c16cf49c3f19e887da31d671a713619c8626484e).
+- Llama.cpp: [commit](https://github.com/ggerganov/llama.cpp/commit/f3c3b4b1672d860800639c87d3b5d17564692469)
