@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-
+set -euxo pipefail
 #
 # Start a bash, mount /workspace to be current directory.
 #
@@ -15,10 +15,13 @@ if [ "$#" -lt 1 ]; then
 fi
 
 if [ "$1" == "--no-gpu" ]; then
-	ENABLE_NV_DOCKER=0
+	ENABLE_GPU=""
+	shift
+elif [ "$1" == "--amd" ]; then
+	ENABLE_GPU="amd"
 	shift
 else
-	ENABLE_NV_DOCKER=1
+	ENABLE_GPU="nv"
 fi
 
 DOCKER_IMAGE_NAME=("$1")
@@ -40,25 +43,16 @@ fi
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 WORKSPACE="$(pwd)"
 
-# Use nvidia-docker if the container is GPU.
-if [[ ! -z $CUDA_VISIBLE_DEVICES ]]; then
-	CUDA_ENV="-e CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES}"
-else
-	CUDA_ENV=""
-fi
-
-# If this is an wheel test command then pass the env var to docker.
-if [[ ! -z $WHEEL_TEST ]]; then
-	WHEEL_TEST="-e WHEEL_TEST=${WHEEL_TEST}"
-fi
-
-if [ "$ENABLE_NV_DOCKER" -eq 1 ]; then
+if [ "$ENABLE_GPU" == "nv" ]; then
 	if ! type "nvidia-docker" 1>/dev/null 2>/dev/null; then
 		DOCKER_BINARY="docker"
 		CUDA_ENV=" --gpus all "${CUDA_ENV}
 	else
 		DOCKER_BINARY="nvidia-docker"
 	fi
+elif [ "$ENABLE_GPU" == "amd" ]; then
+	CUDA_ENV=" --device=/dev/kfd --device=/dev/dri --security-opt seccomp=unconfined --group-add video"
+	DOCKER_BINARY="docker"
 else
 	DOCKER_BINARY="docker"
 fi
@@ -78,7 +72,6 @@ ${DOCKER_BINARY} run --rm --pid=host -v ${WORKSPACE}:/workspace \
 	-v ${SCRIPT_DIR}:/docker \
 	-w /workspace \
 	${CUDA_ENV} \
-	${WHEEL_TEST} \
 	${DOCKER_EXTRA_PARAMS[@]} \
 	${DOCKER_IMAGE_NAME} \
 	${COMMAND[@]}

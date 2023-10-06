@@ -20,13 +20,30 @@ TBD
 
 ## Instructions
 
-First of all, NVIDIA Docker is required: https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#docker. Then, clone this repo and operate on the root of it.
+### Prerequisites
+
+Before proceeding, make sure you have NVIDIA Docker installed for NVIDIA GPUs. Follow the installation guide at [NVIDIA Docker Installation Guide](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#docker) for detailed instructions.
+
+For NVIDIA GPUs, use the following command to verify the setup:
 
 ```bash
 docker run --gpus all nvidia/cuda:12.1.1-devel-ubuntu22.04 nvidia-smi
+```
+
+If you are using AMD GPUs, ensure ROCm is installed to run Docker. Use the following command:
+
+```bash
+docker run --device=/dev/kfd --device=/dev/dri --security-opt seccomp=unconfined --group-add video rocm/rocm-terminal rocm-smi
+```
+
+**Repository Setup:** Clone the repository, as all subsequent steps assume you are in the repository root:
+
+```bash
 git clone https://github.com/mlc-ai/llm-perf-bench
 cd llm-perf-bench
 ```
+
+Now you are ready to proceed with the next steps in the repository.
 
 ### MLC LLM
 
@@ -38,6 +55,7 @@ In this section, we use int4 quantized Llama2 as an example.
 
 ```bash
 docker build -t llm-perf-mlc:v0.1 -f ./docker/Dockerfile.cu121.mlc .
+# docker build -t llm-perf-mlc:v0.1 -f ./docker/Dockerfile.rocm57.mlc .
 git lfs install
 git clone https://huggingface.co/mlc-ai/mlc-chat-Llama-2-7b-chat-hf-q4f16_1
 # git clone https://huggingface.co/mlc-ai/mlc-chat-Llama-2-13b-chat-hf-q4f16_1
@@ -55,6 +73,7 @@ git clone https://huggingface.co/mlc-ai/mlc-chat-Llama-2-7b-chat-hf-q4f16_1
 
 ```bash
 ./docker/bash.sh llm-perf-mlc:v0.1
+# ./docker/bash.sh -amd llm-perf-mlc:v0.1
 
 conda activate python311
 
