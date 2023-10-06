@@ -120,7 +120,7 @@ CUDA_VISIBLE_DEVICES=0 ./build/bin/main -m /models/llama-2-7b.Q4_K_M.gguf -p "Pl
 CUDA_VISIBLE_DEVICES=0,1 ./build/bin/main -m /models/llama-2-70b.Q4_K_M.gguf -p "Please generate a very long story about wizard and technology, at least two thousand words" -n 128 -ngl 999 --ignore-eos
 ```
 
-To evaluate the performance of the float16 model, please convert the 70B model to GGUF FP16 format first.
+To evaluate the performance of the float16 model, please convert the hf models to GGUF FP16 format first.
 ```bash
 cd $LLAMA_CPP_HOME
 python3 convert.py /models/Llama-2-70b-hf/ --outfile /models/llama-2-70b.fp16.gguf
@@ -142,7 +142,7 @@ Download Llama-2-70b-hf weight from [huggingface](https://huggingface.co/meta-ll
 
 ```bash
 PORT=41598
-MODEL_WEIGHTS=/PATH/TO/Llama-2-70b-hf/  # Replace it with path to HuggingFace models
+MODEL_WEIGHTS=/PATH/TO/Llama-2-70b-hf/  # Replace this with the path to the directory containing the HuggingFace models
 
 docker run                   \
   -d -P                      \
@@ -163,9 +163,9 @@ Log in to the docker container we created using the command below:
 
 ```bash
 micromamba activate python311
-# test the float16 quantized model
+# test float16 model
 python benchmark_hf.py --model-path /models/Llama-2-70b-hf --format q0f16
-# test the 4-bit quantized model
+# test 4-bit quantized model
 python benchmark_hf.py --model-path /models/Llama-2-70b-hf --format q4f16
 ```
 
