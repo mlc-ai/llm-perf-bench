@@ -5,8 +5,8 @@ LLM Performance Benchmarking
 
 | Model      | GPU         | MLC LLM (tok/sec) | Exllama (tok/sec) | Llama.cpp (tok/sec) |
 |------------|-------------|-------------------|-------------------|---------------------|
-| Llama2-7B  | RTX 3090 Ti | 166.7             | 112.72            | 113.34              |
-| Llama2-13B | RTX 3090 Ti | 99.2              | 69.31             | 71.34               |
+| Llama2-7B  | RTX 3090 Ti | 166.7             | 112.72            | 123.75              |
+| Llama2-13B | RTX 3090 Ti | 99.2              | 69.31             | 76.18               |
 | Llama2-7B  | RTX 4090    | 191.0             | 152.56            | 50.13               |
 | Llama2-13B | RTX 4090    | 108.8             | 93.88             | 36.81               |
 
@@ -15,7 +15,7 @@ All experiments are based on int4-quantized weights, fp16 activation and compute
 Commit:
 - MLC LLM [commit](https://github.com/mlc-ai/mlc-llm/commit/502f6808b8073b87e561817a5a80b50810ab47be), TVM [commit](https://github.com/apache/tvm/commit/543838303b4289bb5669688efb9f88b15ddc2ebe);
 - Exllama [commit](https://github.com/turboderp/exllama/commit/c16cf49c3f19e887da31d671a713619c8626484e).
-- Llama.cpp: [commit](https://github.com/ggerganov/llama.cpp/commit/f3c3b4b1672d860800639c87d3b5d17564692469)
+- Llama.cpp: [commit](https://github.com/ggerganov/llama.cpp/commit/9476b012260a2fb6c67976582d64484ce7406ed9)
 
 
 ## Instructions
@@ -81,7 +81,7 @@ docker build -t llm-perf-llama-cpp:v0.1 -f Dockerfile.cu121.llama_cpp .
 **Step 2**. Download the quantized GGML models and run Llama2 via llama.cpp.
 
 To obtain the quantized GGUF model, it is recommended to download it via HuggingFace using
-the command below:
+the command below(replace `/PATH/TO/MODELS` with your custom path):
 
 ```bash
 wget -O /PATH/TO/MODELS/llama-2-7b.Q4_K_M.gguf https://huggingface.co/TheBloke/Llama-2-7B-GGUF/resolve/main/llama-2-7b.Q4_K_M.gguf 
@@ -93,7 +93,7 @@ To test on float16 format, download Llama-2-70b-hf weight from [huggingface](htt
 
 ```bash
 PORT=41514
-MODEL_PATH=/PATH/TO/MODELS/  # Replace this with the path to the directory containing the HuggingFace model
+MODEL_PATH=/PATH/TO/MODELS/  # Replace this with the path to the directory containing the HuggingFace models
 
 docker run                  \
   -d -P                     \
