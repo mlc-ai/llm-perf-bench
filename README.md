@@ -232,24 +232,21 @@ docker build --no-cache -t llm-perf-exllama-v2:v0.1    \
 conda activate python311
 ```
 
-**Step 2**. Stay logged in, set some basic environment variables for convenient scripting.
-</details>
-
 **Step 2**. Stay logged in, run benchmarking
 
 <details>
 
 For single GPU:
 ```bash
-MODEL_PATH=$(pwd)/Llama-2-70B-GGML/
+MODEL_PATH=$(pwd)/Llama-2-70B-GPTQ/
 OUTPUT_LEN=250
-cd exllamav2
+cd /exllamav2
 python test_inference.py -m $MODEL_PATH -p "What is the meaning of life?" -t $OUTPUT_LEN
 ```
 
 For Multiple GPU:
 ```bash
-MODEL_PATH=$(pwd)/Llama-2-70B-GGML/
+MODEL_PATH=$(pwd)/Llama-2-70B-GPTQ/
 OUTPUT_LEN=250
 GPU_SPLIT="17,17" # depend on how you want to split memory
 cd exllamav2

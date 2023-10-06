@@ -20,5 +20,7 @@ RUN bash <(curl -L micro.mamba.pm/install.sh) && source ~/.bashrc       && \
 RUN git clone https://github.com/turboderp/exllamav2.git /exllamav2     && \
     echo "export PYTHONPATH=\"/exllamav2/:$PYTHONPATH\"" >> ~/.bashrc
 
-RUN pip install -r /exllamav2/requirements.txt
+RUN source ~/.bashrc && \
+    micromamba activate python311 && \
+    pip3 install -r /exllamav2/requirements.txt
 
