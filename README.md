@@ -55,6 +55,7 @@ In this section, we use int4 quantized Llama2 as an example.
 
 ```bash
 docker build -t llm-perf-mlc:v0.1 -f ./docker/Dockerfile.cu121.mlc .
+# docker build -t llm-perf-mlc:v0.1 -f ./docker/Dockerfile.rocm57.mlc .
 git lfs install
 git clone https://huggingface.co/mlc-ai/mlc-chat-Llama-2-7b-chat-hf-q4f16_1
 # git clone https://huggingface.co/mlc-ai/mlc-chat-Llama-2-13b-chat-hf-q4f16_1
@@ -72,6 +73,7 @@ git clone https://huggingface.co/mlc-ai/mlc-chat-Llama-2-7b-chat-hf-q4f16_1
 
 ```bash
 ./docker/bash.sh llm-perf-mlc:v0.1
+# ./docker/bash.sh -amd llm-perf-mlc:v0.1
 
 conda activate python311
 
