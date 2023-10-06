@@ -22,7 +22,7 @@ TBD
 
 ### Prerequisites
 
-Before proceeding, make sure you have NVIDIA Docker installed for NVIDIA GPUs. Follow the installation guide at [NVIDIA Docker Installation Guide](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#docker) for detailed instructions.
+**GPU Docker**. Before proceeding, make sure you have NVIDIA Docker installed for NVIDIA GPUs. Follow the installation guide at [NVIDIA Docker Installation Guide](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#docker) for detailed instructions.
 
 For NVIDIA GPUs, use the following command to verify the setup:
 
@@ -36,7 +36,7 @@ If you are using AMD GPUs, ensure ROCm is installed to run Docker. Use the follo
 docker run --device=/dev/kfd --device=/dev/dri --security-opt seccomp=unconfined --group-add video rocm/rocm-terminal rocm-smi
 ```
 
-**Repository Setup:** Clone the repository, as all subsequent steps assume you are in the repository root:
+**Repository Setup**. Clone the repository, as all subsequent steps assume you are in the repository root:
 
 ```bash
 git clone https://github.com/mlc-ai/llm-perf-bench
@@ -67,7 +67,7 @@ git clone https://huggingface.co/mlc-ai/mlc-chat-Llama-2-7b-chat-hf-q4f16_1
 
 </details>
 
-**Step 2.** Log into docker, activate Python environment, and set some basic environment variables for convenient scripting.
+**Step 2**. Log into docker, activate Python environment, and set some basic environment variables for convenient scripting.
 
 <details>
 
@@ -98,7 +98,7 @@ rm -rf $PATH_TEST && mkdir $PATH_TEST && rm -rf $PATH_COMPILE && mkdir $PATH_COM
 
 </details>
 
-**Step 3.** Stay logged in, and compile MLC model lib. It may take a few seconds:
+**Step 3**. Stay logged in, and compile MLC model lib. It may take a few seconds:
 
 <details>
 
@@ -115,7 +115,7 @@ mv $PATH_COMPILE/model-${QUANTIZATION}/model-${QUANTIZATION}-cuda.so $PATH_TEST/
 
 </details>
 
-**Step 4.** Run benchmarking:
+**Step 4**. Stay logged in, and run benchmarking:
 
 <details>
 
