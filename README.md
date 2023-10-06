@@ -135,7 +135,39 @@ TBD
 
 ### Llama.cpp
 
-TBD
+**Step 1**. Build Docker image:
+
+<details>
+```bash
+docker build -t llm-perf-llama-cpp:v0.1 -f ./docker/Dockerfile.cu121.llama_cpp .
+```
+</details>
+
+**Step 2**. Download the quantized GGML models from HuggingFace:
+```bash
+wget -O ./llama_cpp_models/llama-2-7b.Q4_K_M.gguf https://huggingface.co/TheBloke/Llama-2-7B-GGUF/resolve/main/llama-2-7b.Q4_K_M.gguf 
+# wget -O ./llama_cpp_models/llama-2-13b.Q4_K_M.gguf https://huggingface.co/TheBloke/Llama-2-13B-GGUF/resolve/main/llama-2-13b.Q4_K_M.gguf
+# wget -O ./llama_cpp_models/llama-2-70b.Q4_K_M.gguf https://huggingface.co/TheBloke/Llama-2-70B-GGUF/resolve/main/llama-2-70b.Q4_K_M.gguf
+```
+
+**Step 3**. Log into docker, and the CLI tool to see the performance numbers:
+```bash
+./docker/bash.sh llm-perf-llama-cpp:v0.1
+cd /llama.cpp
+# run quantized models
+CUDA_VISIBLE_DEVICES=0 ./build/bin/main -m /workspace/llama_cpp_models/llama-2-7b.Q4_K_M.gguf -p "What is the meaning of life?" -n 128 -ngl 999 --ignore-eos
+# test quantized 70B models on 2 gpus
+CUDA_VISIBLE_DEVICES=0,1 ./build/bin/main -m /workspace/llama_cpp_models/llama-2-70b.Q4_K_M.gguf -p "What is the meaning of life?" -n 128 -ngl 999 --ignore-eos
+```
+
+**Note**. For float16 models, stay logged in and convert the hf models(download [here](https://huggingface.co/meta-llama/Llama-2-70b-hf)) to GGUF FP16 format first.
+```bash
+cd /llama.cpp
+# convert the weight using llama.cpp script
+python3 convert.py /path/to/Llama-2-70b-hf/ --outfile /workspace/llama_cpp_models/llama-2-70b.fp16.gguf
+# run fp16 models
+CUDA_VISIBLE_DEVICES=0,1,2,3 ./build/bin/main -m /workspace/llama-2-70b.fp16.gguf -p "What is the meaning of life?" -n 128 -ngl 999 --ignore-eos
+```
 
 ## Setup Details
 
