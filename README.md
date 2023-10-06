@@ -3,20 +3,20 @@ LLM Performance Benchmarking
 
 ## Performance
 
+### Int4-quantized, Single GPU
+
 | Model      | GPU         | MLC LLM (tok/sec) | Exllama (tok/sec) | Llama.cpp (tok/sec) |
 |------------|-------------|-------------------|-------------------|---------------------|
-| Llama2-7B  | RTX 3090 Ti | 166.7             | 112.72            | 113.34              |
-| Llama2-13B | RTX 3090 Ti | 99.2              | 69.31             | 71.34               |
-| Llama2-7B  | RTX 4090    | 191.0             | 152.56            | 50.13               |
-| Llama2-13B | RTX 4090    | 108.8             | 93.88             | 36.81               |
+| Llama2-7B  | RTX 3090 Ti | 186.7             | 112.72            | 113.34              |
+| Llama2-13B | RTX 3090 Ti | 107.4             | 69.31             | 71.34               |
+| Llama2-7B  | RTX 4090    | 204.8             | 152.56            | 50.13               |
+| Llama2-13B | RTX 4090    | 113.5             | 93.88             | 36.81               |
 
-All experiments are based on int4-quantized weights, fp16 activation and compute.
+All experiments are based on int4-quantized weights, fp16 activation and compute, decoding for 256 tokens with a prompt "What is the meaning of life?".
 
-Commit:
-- MLC LLM [commit](https://github.com/mlc-ai/mlc-llm/commit/502f6808b8073b87e561817a5a80b50810ab47be), TVM [commit](https://github.com/apache/tvm/commit/543838303b4289bb5669688efb9f88b15ddc2ebe);
-- Exllama [commit](https://github.com/turboderp/exllama/commit/c16cf49c3f19e887da31d671a713619c8626484e).
-- Llama.cpp: [commit](https://github.com/ggerganov/llama.cpp/commit/f3c3b4b1672d860800639c87d3b5d17564692469)
+### FP16, Multi-GPU
 
+TBD
 
 ## Instructions
 
@@ -24,47 +24,84 @@ First of all, NVIDIA Docker is required: https://docs.nvidia.com/datacenter/clou
 
 ### MLC LLM
 
-**Step 1**. Build Docker image
+In this section, we use int4 quantized Llama2 as an example.
+
+**Step 1**. Build Docker image and download pre-quantized weights from HuggingFace:
+
+<details>
 
 ```bash
-docker build -t llm-perf-mlc:v0.1 -f Dockerfile.cu121.mlc .
+docker build -t llm-perf-mlc:v0.1 -f ./docker/Dockerfile.cu121.mlc .
+git clone https://huggingface.co/mlc-ai/mlc-chat-Llama-2-7b-chat-hf-q4f16_1
+# git clone https://huggingface.co/mlc-ai/mlc-chat-Llama-2-13b-chat-hf-q4f16_1
+# git clone https://huggingface.co/mlc-ai/mlc-chat-Llama-2-70b-chat-hf-q4f16_1
+# git clone https://huggingface.co/mlc-ai/mlc-chat-CodeLlama-7b-Instruct-hf-q4f16_1
+# git clone https://huggingface.co/mlc-ai/mlc-chat-CodeLlama-13b-Instruct-hf-q4f16_1
+# git clone https://huggingface.co/mlc-ai/mlc-chat-CodeLlama-34b-Instruct-hf-q4f16_1
 ```
 
-**Step 2**. Quantize and run Llama2. Log in to the docker container we created using the comamnd below:
+</details>
+
+**Step 2.** Log into docker, activate Python environment, and set some basic environment variables for convenient scripting.
+
+<details>
 
 ```bash
-PORT=45678
-MODELS=/PATH/TO/MODEL/ # Replace the path to HuggingFace models
+./docker/bash.sh llm-perf-mlc:v0.1
 
-docker run            \
-  -d -P               \
-  --gpus all          \
-  -h llm-perf         \
-  --name llm-perf     \
-  -p $PORT:22         \
-  -v $MODELS:/models  \
-  llm-perf-mlc:v0.1
+conda activate python311
 
-# Password is: llm_perf
-ssh root@0.0.0.0 -p $PORT
+MODEL_NAME=Llama-2-7b-chat-hf
+QUANTIZATION=q4f16_1
+NUM_SHARDS=1
+PATH_COMPILE=/tmp/model/
+PATH_TEST=/tmp/test/
 
-# Inside the container, run the following commands:
-micromamba activate python311
+MODEL_CONFIG=./model_configs/${MODEL_NAME}.json
+WEIGHT_PATH=$(pwd)/mlc-chat-${MODEL_NAME}-${QUANTIZATION}/
 
-cd $MLC_HOME
-python build.py                       \
-  --model /models/Llama-2-7b-chat-hf  \  # Replace it with path to HuggingFace models
-  --target cuda                       \
-  --quantization q4f16_1              \
-  --artifact-path "./dist"            \
-  --use-cache 0
+if [ -e "$WEIGHT_PATH/mlc-chat-config.json" ]; then
+	sed -i "/\"num_shards\"/c\ \"num_shards\": ${NUM_SHARDS}," $WEIGHT_PATH/mlc-chat-config.json
+else
+	echo "Path '$WEIGHT_PATH/mlc-chat-config.json' does not exist."
+	exit
+fi
+
+rm -rf $PATH_TEST && mkdir $PATH_TEST && rm -rf $PATH_COMPILE && mkdir $PATH_COMPILE && ln -s ${WEIGHT_PATH} ${PATH_TEST}/params && cp $MODEL_CONFIG $PATH_COMPILE/config.json
 ```
 
-The quantized and compiled model will be exported to `./dist/Llama-2-7b-chat-hf-q4f16_1`.
+</details>
 
-**Step 3.** Run the Python bechmarking scripts according to "examples/python
-/benchmark.py".
+**Step 3.** Stay logged in, and compile MLC model lib. It may take a few seconds:
 
+<details>
+
+```bash
+python -m mlc_llm.build \
+	--model $PATH_COMPILE \
+	--artifact-path $PATH_COMPILE \
+	--quantization $QUANTIZATION \
+	--max-seq-len 2048 \
+	--num-shards $NUM_SHARDS \
+	--target cuda --use-cuda-graph --build-model-only
+mv $PATH_COMPILE/model-${QUANTIZATION}/model-${QUANTIZATION}-cuda.so $PATH_TEST/${MODEL_NAME}-${QUANTIZATION}-cuda.so
+```
+
+</details>
+
+**Step 4.** Run benchmarking:
+
+<details>
+
+```bash
+python -m mlc_chat.cli.benchmark \
+	--model ${PATH_TEST}/params \
+	--device "cuda:0" \
+	--prompt "What is the meaning of life?" \
+	--generate-length 256
+```
+
+</details>
 
 ### Exllama
 
@@ -72,52 +109,11 @@ TBD
 
 ### Llama.cpp
 
-**Step 1**. Build Docker image
+TBD
 
-```bash
-docker build -t llm-perf-llama-cpp:v0.1 -f Dockerfile.cu121.llama_cpp .
-```
+## Setup Details
 
-**Step 2**. Download the quantized GGML models and run Llama2 via llama.cpp.
-
-To obtain the quantized GGML model, it is recommended to download it via HuggingFace using
-the comamnd below:
-
-```bash
-wget https://huggingface.co/TheBloke/Llama-2-7B-GGML/resolve/main/llama-2-7b.ggmlv3.q4_K_M.bin
-wget https://huggingface.co/TheBloke/Llama-2-13B-GGML/resolve/main/llama-2-13b.ggmlv3.q4_K_M.bin
-```
-
-```bash
-PORT=41514
-GGML_BINS=/PATH/TO/GGML_BINS/  # Replace it with path to HuggingFace models
-
-docker run                  \
-  -d -P                     \
-  --gpus all                \
-  -h llm-perf               \
-  --name llm-perf-llama-cpp \
-  -p $PORT:22               \
-  -v $GGML_BINS:/ggml_bins  \
-  llm-perf-llama-cpp:v0.1
-
-# Password is: llm_perf
-ssh root@0.0.0.0 -p $PORT
-```
-
-**Step 3.** Run the CLI tool to see the performance numbers:
-
-Log in to the docker container we created using the comamnd below:
-
-```bash
-cd $LLAMA_CPP_HOME
-./build/bin/main -m /ggml_bins/llama-2-7b.ggmlv3.q4_K_M.bin -p "Please generate a very long story about wizard and technology, at least two thousand words" -n 128 -ngl 999 --ignore-eos
-```
-
-## TODOs
-
-Only decoding performance is currently benchmarked given prefilling usually takes much shorter time with flash attention.
-
-Currently, MLC LLM number includes a [long system prompt](https://github.com/mlc-ai/mlc-llm/blob/c40be6a210e4d8844b8a65951bcfaa44b528b8f9/cpp/conv_templates.cc#L35),
-while Exllama numbers are from a fixed-length system prompt of 4 tokens,
-which is not exactly apple-to-apple comparison. Should get it fixed.
+We are using the following commits:
+- MLC LLM [commit](https://github.com/mlc-ai/mlc-llm/commit/8e94910ec7967cbe749dbf04713f96a52cccbc19), TVM [commit](https://github.com/mlc-ai/relax/commits/e5ca38dd735ba4d30782a4a58bf6195861642eb0);
+- Exllama [commit](https://github.com/turboderp/exllama/commit/c16cf49c3f19e887da31d671a713619c8626484e).
+- Llama.cpp: [commit](https://github.com/ggerganov/llama.cpp/commit/f3c3b4b1672d860800639c87d3b5d17564692469)
