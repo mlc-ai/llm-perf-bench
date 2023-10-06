@@ -73,7 +73,7 @@ git clone https://huggingface.co/mlc-ai/mlc-chat-Llama-2-7b-chat-hf-q4f16_1
 
 ```bash
 ./docker/bash.sh llm-perf-mlc:v0.1
-# ./docker/bash.sh -amd llm-perf-mlc:v0.1
+# ./docker/bash.sh --amd llm-perf-mlc:v0.1
 
 conda activate python311
 
