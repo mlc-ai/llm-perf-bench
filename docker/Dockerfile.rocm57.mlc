@@ -5,8 +5,9 @@ FROM rocm/dev-ubuntu-22.04:5.7-complete
 SHELL ["/bin/bash", "-ec"]
 
 # Step 1. Set up bashrc
-RUN grep -v '[ -z "\$PS1" ] && return' ~/.bashrc >/tmp/bashrc && \
-    echo "alias conda=micromamba" >>/tmp/bashrc               && \
+RUN grep -v '[ -z "\$PS1" ] && return' ~/.bashrc >/tmp/bashrc           && \
+    echo "alias conda=micromamba" >>/tmp/bashrc                         && \
+    echo "export PATH=/opt/rocm/llvm/bin:\$PATH" >>/tmp/bashrc          && \
     mv /tmp/bashrc ~/.bashrc
 
 RUN apt update                                                          && \

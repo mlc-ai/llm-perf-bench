@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-set -euxo pipefail
 #
 # Start a bash, mount /workspace to be current directory.
 #

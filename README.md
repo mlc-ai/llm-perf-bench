@@ -24,17 +24,32 @@ TBD
 
 **GPU Docker**. Before proceeding, make sure you have NVIDIA Docker installed for NVIDIA GPUs. Follow the installation guide at [NVIDIA Docker Installation Guide](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#docker) for detailed instructions.
 
-For NVIDIA GPUs, use the following command to verify the setup:
+<table>
+<tr>
+<th> CUDA </th>
+<th> ROCm </th>
+</tr>
+<tr>
+<td>
 
 ```bash
-docker run --gpus all nvidia/cuda:12.1.1-devel-ubuntu22.04 nvidia-smi
+docker run --gpus all \
+  nvidia/cuda:12.1.1-devel-ubuntu22.04 nvidia-smi
 ```
 
-If you are using AMD GPUs, ensure ROCm is installed to run Docker. Use the following command:
+</td>
+<td>
 
 ```bash
-docker run --device=/dev/kfd --device=/dev/dri --security-opt seccomp=unconfined --group-add video rocm/rocm-terminal rocm-smi
+docker run --device=/dev/kfd --device=/dev/dri   \
+           --security-opt seccomp=unconfined     \
+           --group-add video \
+       rocm/rocm-terminal rocm-smi
 ```
+
+</td>
+</tr>
+</table>
 
 **Repository Setup**. Clone the repository, as all subsequent steps assume you are in the repository root:
 
@@ -49,13 +64,11 @@ Now you are ready to proceed with the next steps in the repository.
 
 In this section, we use int4 quantized Llama2 as an example.
 
-**Step 1**. Build Docker image and download pre-quantized weights from HuggingFace:
+**Step 1**. Build Docker image and download pre-quantized weights from HuggingFace, then log into the docker image and activate Python environment:
 
 <details>
 
 ```bash
-docker build -t llm-perf-mlc:v0.1 -f ./docker/Dockerfile.cu121.mlc .
-# docker build -t llm-perf-mlc:v0.1 -f ./docker/Dockerfile.rocm57.mlc .
 git lfs install
 git clone https://huggingface.co/mlc-ai/mlc-chat-Llama-2-7b-chat-hf-q4f16_1
 # git clone https://huggingface.co/mlc-ai/mlc-chat-Llama-2-13b-chat-hf-q4f16_1
@@ -65,18 +78,42 @@ git clone https://huggingface.co/mlc-ai/mlc-chat-Llama-2-7b-chat-hf-q4f16_1
 # git clone https://huggingface.co/mlc-ai/mlc-chat-CodeLlama-34b-Instruct-hf-q4f16_1
 ```
 
+<table>
+<tr>
+<th> CUDA </th>
+<th> ROCm </th>
+</tr>
+<tr>
+<td>
+
+```bash
+docker build --no-cache -t llm-perf-mlc:v0.1    \
+    -f ./docker/Dockerfile.cu121.mlc .
+./docker/bash.sh llm-perf-mlc:v0.1
+conda activate python311
+```
+
+</td>
+<td>
+
+```bash
+docker build --no-cache -t llm-perf-mlc:v0.1    \
+    -f ./docker/Dockerfile.rocm57.mlc .
+./docker/bash.sh --amd llm-perf-mlc:v0.1
+conda activate python311
+```
+
+</td>
+</tr>
+</table>
+
 </details>
 
-**Step 2**. Log into docker, activate Python environment, and set some basic environment variables for convenient scripting.
+**Step 2**. Stay logged in, set some basic environment variables for convenient scripting.
 
 <details>
 
 ```bash
-./docker/bash.sh llm-perf-mlc:v0.1
-# ./docker/bash.sh -amd llm-perf-mlc:v0.1
-
-conda activate python311
-
 MODEL_NAME=Llama-2-7b-chat-hf
 QUANTIZATION=q4f16_1
 NUM_SHARDS=1
@@ -102,6 +139,14 @@ rm -rf $PATH_TEST && mkdir $PATH_TEST && rm -rf $PATH_COMPILE && mkdir $PATH_COM
 
 <details>
 
+<table>
+<tr>
+<th> CUDA </th>
+<th> ROCm </th>
+</tr>
+<tr>
+<td>
+
 ```bash
 python -m mlc_llm.build \
 	--model $PATH_COMPILE \
@@ -110,14 +155,42 @@ python -m mlc_llm.build \
 	--max-seq-len 2048 \
 	--num-shards $NUM_SHARDS \
 	--target cuda --use-cuda-graph --build-model-only
-mv $PATH_COMPILE/model-${QUANTIZATION}/model-${QUANTIZATION}-cuda.so $PATH_TEST/${MODEL_NAME}-${QUANTIZATION}-cuda.so
+mv $PATH_COMPILE/model-${QUANTIZATION}/model-${QUANTIZATION}-cuda.so \
+                    $PATH_TEST/${MODEL_NAME}-${QUANTIZATION}-cuda.so
 ```
+
+</td>
+<td>
+
+```bash
+python -m mlc_llm.build \
+	--model $PATH_COMPILE \
+	--artifact-path $PATH_COMPILE \
+	--quantization $QUANTIZATION \
+	--max-seq-len 2048 \
+	--num-shards $NUM_SHARDS \
+	--target rocm --build-model-only
+mv $PATH_COMPILE/model-${QUANTIZATION}/model-${QUANTIZATION}-rocm.so \
+                    $PATH_TEST/${MODEL_NAME}-${QUANTIZATION}-rocm.so
+```
+
+</td>
+</tr>
+</table>
 
 </details>
 
 **Step 4**. Stay logged in, and run benchmarking:
 
 <details>
+
+<table>
+<tr>
+<th> CUDA </th>
+<th> ROCm </th>
+</tr>
+<tr>
+<td>
 
 ```bash
 python -m mlc_chat.cli.benchmark \
@@ -126,6 +199,21 @@ python -m mlc_chat.cli.benchmark \
 	--prompt "What is the meaning of life?" \
 	--generate-length 256
 ```
+
+</td>
+<td>
+
+```bash
+python -m mlc_chat.cli.benchmark \
+	--model ${PATH_TEST}/params \
+	--device "rocm:0" \
+	--prompt "What is the meaning of life?" \
+	--generate-length 256
+```
+
+</td>
+</tr>
+</table>
 
 </details>
 
