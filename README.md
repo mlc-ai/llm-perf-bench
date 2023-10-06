@@ -15,7 +15,7 @@ All experiments are based on int4-quantized weights, fp16 activation and compute
 Commit:
 - MLC LLM [commit](https://github.com/mlc-ai/mlc-llm/commit/502f6808b8073b87e561817a5a80b50810ab47be), TVM [commit](https://github.com/apache/tvm/commit/543838303b4289bb5669688efb9f88b15ddc2ebe);
 - Exllama [commit](https://github.com/turboderp/exllama/commit/c16cf49c3f19e887da31d671a713619c8626484e).
-- Llama.cpp: [commit](https://github.com/ggerganov/llama.cpp/commit/9476b012260a2fb6c67976582d64484ce7406ed9)
+- Llama.cpp [commit](https://github.com/ggerganov/llama.cpp/commit/9476b012260a2fb6c67976582d64484ce7406ed9)
 
 
 ## Instructions
