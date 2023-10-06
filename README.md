@@ -49,7 +49,7 @@ Now you are ready to proceed with the next steps in the repository.
 
 In this section, we use int4 quantized Llama2 as an example.
 
-**Step 1**. Build Docker image and download pre-quantized weights from HuggingFace:
+**Step 1**. Build Docker image and download pre-quantized weights from HuggingFace, then log into the docker image and activate Python environment:
 
 <details>
 
@@ -63,15 +63,7 @@ git clone https://huggingface.co/mlc-ai/mlc-chat-Llama-2-7b-chat-hf-q4f16_1
 # git clone https://huggingface.co/mlc-ai/mlc-chat-CodeLlama-7b-Instruct-hf-q4f16_1
 # git clone https://huggingface.co/mlc-ai/mlc-chat-CodeLlama-13b-Instruct-hf-q4f16_1
 # git clone https://huggingface.co/mlc-ai/mlc-chat-CodeLlama-34b-Instruct-hf-q4f16_1
-```
 
-</details>
-
-Then log into the docker image and activate Python environment:
-
-<details>
-
-```bash
 ./docker/bash.sh llm-perf-mlc:v0.1
 # ./docker/bash.sh --amd llm-perf-mlc:v0.1
 conda activate python311
