@@ -254,9 +254,9 @@ wget -O ./llama_cpp_models/llama-2-7b.Q4_K_M.gguf https://huggingface.co/TheBlok
 ./docker/bash.sh llm-perf-llama-cpp:v0.1
 cd /llama.cpp
 # run quantized models on a single GPU.
-CUDA_VISIBLE_DEVICES=0 ./build/bin/main -m /workspace/llama_cpp_models/llama-2-7b.Q4_K_M.gguf -p "What is the meaning of life?" -n 128 -ngl 999 --ignore-eos
+CUDA_VISIBLE_DEVICES=0 ./build/bin/main -m /workspace/llama_cpp_models/llama-2-7b.Q4_K_M.gguf -p "What is the meaning of life?" -n 256 -ngl 999 --ignore-eos
 # test quantized 70B models on 2 GPUS.
-CUDA_VISIBLE_DEVICES=0,1 ./build/bin/main -m /workspace/llama_cpp_models/llama-2-70b.Q4_K_M.gguf -p "What is the meaning of life?" -n 128 -ngl 999 --ignore-eos
+CUDA_VISIBLE_DEVICES=0,1 ./build/bin/main -m /workspace/llama_cpp_models/llama-2-70b.Q4_K_M.gguf -p "What is the meaning of life?" -n 256 -ngl 999 --ignore-eos
 ```
 
 </details>
@@ -270,7 +270,7 @@ cd /llama.cpp
 # convert the weight using llama.cpp script
 python3 convert.py /path/to/Llama-2-70b-hf/ --outfile /workspace/llama_cpp_models/llama-2-70b.fp16.gguf
 # run fp16 models on 4 GPUs.
-CUDA_VISIBLE_DEVICES=0,1,2,3 ./build/bin/main -m /workspace/llama-2-70b.fp16.gguf -p "What is the meaning of life?" -n 128 -ngl 999 --ignore-eos
+CUDA_VISIBLE_DEVICES=0,1,2,3 ./build/bin/main -m /workspace/llama-2-70b.fp16.gguf -p "What is the meaning of life?" -n 256 -ngl 999 --ignore-eos
 ```
 
 </details>
