@@ -20,7 +20,13 @@ TBD
 
 ## Instructions
 
-First of all, NVIDIA Docker is required: https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#docker.
+First of all, NVIDIA Docker is required: https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#docker. Then, clone this repo and operate on the root of it.
+
+```bash
+docker run --gpus all nvidia/cuda:12.1.1-devel-ubuntu22.04 nvidia-smi
+git clone https://github.com/mlc-ai/llm-perf-bench
+cd llm-perf-bench
+```
 
 ### MLC LLM
 
