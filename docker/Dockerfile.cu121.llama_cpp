@@ -5,27 +5,27 @@ FROM nvidia/cuda:12.1.0-devel-ubuntu22.04
 SHELL ["/bin/bash", "-ec"]
 
 # Step 1. Set up bashrc
-RUN grep -v '[ -z "\$PS1" ] && return' ~/.bashrc >/tmp/bashrc && \
-    echo "alias conda=micromamba" >>/tmp/bashrc               && \
+RUN grep -v '[ -z "\$PS1" ] && return' ~/.bashrc >/tmp/bashrc                               && \
+    echo "alias conda=micromamba" >>/tmp/bashrc                                             && \
     mv /tmp/bashrc ~/.bashrc
 
-RUN apt update                                                                && \
+RUN apt update                                                                              && \
     apt install --yes wget curl git vim build-essential openssh-server cmake
 
 # Step 2. Git clone and compile llama.cpp with cuBLAS
 # NOTE: You may have to tweak `CMAKE_CUDA_ARCHITECTURES`
 # to better accomodate your GPU architecture. It does not usually contribute
 # to performance different though according to our experiments.
-RUN git clone https://github.com/ggerganov/llama.cpp.git /llama.cpp           && \
-    cd llama.cpp                                                              && \
-    git checkout 9476b012260a2fb6c67976582d64484ce7406ed9                     && \
-    mkdir build && cd build                                                   && \
-    cmake .. -DLLAMA_CUBLAS=1 && make -j$(nproc)
+RUN git clone https://github.com/ggerganov/llama.cpp.git /llama.cpp                         && \
+    cd llama.cpp                                                                            && \
+    git checkout 9476b012260a2fb6c67976582d64484ce7406ed9                                   && \
+    mkdir build && cd build                                                                 && \
+    cmake .. -DLLAMA_CUBLAS=1 -DLLAMA_CUDA_MMV_Y=2 -DLLAMA_CUDA_F16=1 && make -j$(nproc)
 
 # Step 3. Set up python
 RUN cd llama.cpp  && \
-    bash <(curl -L micro.mamba.pm/install.sh) && source ~/.bashrc             && \
-    micromamba create --yes -n python311 -c conda-forge                          \
-    python=3.11                                                               && \
-    micromamba activate python311                                             && \
+    bash <(curl -L micro.mamba.pm/install.sh) && source ~/.bashrc                           && \
+    micromamba create --yes -n python311 -c conda-forge                                        \
+    python=3.11                                                                             && \
+    micromamba activate python311                                                           && \
     python3 -m pip install -r requirements.txt
