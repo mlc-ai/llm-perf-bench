@@ -45,7 +45,7 @@ WORKSPACE="$(pwd)"
 if [ "$ENABLE_GPU" == "nv" ]; then
 	if ! type "nvidia-docker" 1>/dev/null 2>/dev/null; then
 		DOCKER_BINARY="docker"
-		CUDA_ENV=" --gpus all "
+		CUDA_ENV=" --gpus all "${CUDA_ENV}
 	else
 		DOCKER_BINARY="nvidia-docker"
 	fi
