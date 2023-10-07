@@ -236,7 +236,17 @@ conda activate python311
 
 </details>
 
-**Step 2**. Stay logged in, run benchmarking
+**Step 2**. Stay logged in, install flash-attn:
+
+<details>
+
+```bash
+MAX_JOBS=16 python -m pip install flash-attn --no-build-isolation
+```
+
+</details>
+
+**Step 3**. Stay logged in, run benchmarking
 
 <details>
 
@@ -256,6 +266,7 @@ GPU_SPLIT="17,17" # depend on how you want to split memory
 cd /exllamav2
 python test_inference.py -m $MODEL_PATH -p "What is the meaning of life?" -gs $GPU_SPLIT -t $OUTPUT_LEN
 ```
+
 </details>
 
 ### Llama.cpp
