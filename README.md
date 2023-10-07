@@ -219,6 +219,8 @@ python -m mlc_chat.cli.benchmark \
 
 </details>
 
+---
+
 ### Exllama V2
 
 In this section, we use Llama2 GPTQ model as an example.
@@ -241,17 +243,10 @@ conda activate python311
 
 </details>
 
-**Step 2**. Stay logged in, install flash-attn:
+**NOTE**. Docker image building for ExllamaV2 is particularly memory consuming on certain GPU instances.
+Kill the process in time if it lags or screen freezes.
 
-<details>
-
-```bash
-MAX_JOBS=16 python -m pip install flash-attn --no-build-isolation
-```
-
-</details>
-
-**Step 3**. Stay logged in, run benchmarking
+**Step 2**. Stay logged in, run benchmarking
 
 <details>
 
