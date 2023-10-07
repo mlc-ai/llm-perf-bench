@@ -230,6 +230,9 @@ In this section, we use Llama2 GPTQ model as an example.
 ```bash
 git lfs install
 git clone https://huggingface.co/TheBloke/Llama-2-7B-GPTQ
+# git clone https://huggingface.co/TheBloke/Llama-2-70B-chat-GPTQ
+# git clone https://huggingface.co/TheBloke/CodeLlama-34B-Instruct-GPTQ
+
 docker build --no-cache -t llm-perf-exllama-v2:v0.1    \
     -f ./docker/Dockerfile.cu121.exllama_v2 .
 ./docker/bash.sh llm-perf-exllama-v2:v0.1
@@ -289,7 +292,9 @@ docker build --no-cache -t llm-perf-llama-cpp:v0.1 -f ./docker/Dockerfile.cu121.
 
 ```bash
 mkdir -p ./llama_cpp_models
-wget -O ./llama_cpp_models/llama-2-7b.Q4_K_M.gguf https://huggingface.co/TheBloke/Llama-2-7B-GGUF/resolve/main/llama-2-7b.Q4_K_M.gguf 
+wget -O ./llama_cpp_models/llama-2-7b.Q4_K_M.gguf https://huggingface.co/TheBloke/Llama-2-7B-GGUF/resolve/main/llama-2-7b.Q4_K_M.gguf
+wget -O ./llama_cpp_models/llama-2-70b.Q4_K_M.gguf https://huggingface.co/TheBloke/Llama-2-70B-GGUF/resolve/main/llama-2-70b.Q4_K_M.gguf
+wget -O ./llama_cpp_models/codellama-34b.Q4_K_M.gguf https://huggingface.co/TheBloke/CodeLlama-34B-GGUF/resolve/main/codellama-34b.Q4_K_M.gguf
 # wget -O ./llama_cpp_models/llama-2-13b.Q4_K_M.gguf https://huggingface.co/TheBloke/Llama-2-13B-GGUF/resolve/main/llama-2-13b.Q4_K_M.gguf
 # wget -O ./llama_cpp_models/llama-2-70b.Q4_K_M.gguf https://huggingface.co/TheBloke/Llama-2-70B-GGUF/resolve/main/llama-2-70b.Q4_K_M.gguf
 ```
@@ -330,6 +335,6 @@ CUDA_VISIBLE_DEVICES=0,1,2,3 ./build/bin/main -m /workspace/llama-2-70b.fp16.ggu
 ## Setup Details
 
 We are using the following commits:
-- MLC LLM [commit](https://github.com/mlc-ai/mlc-llm/commit/8e94910ec7967cbe749dbf04713f96a52cccbc19), TVM [commit](https://github.com/mlc-ai/relax/commits/e5ca38dd735ba4d30782a4a58bf6195861642eb0);
-- ExllamaV2 [commit](https://github.com/turboderp/exllamav2/commit/9d6fdb952f6705f79415364e9d85989dcda01478).
-- Llama.cpp: [commit](https://github.com/ggerganov/llama.cpp/commit/9476b012260a2fb6c67976582d64484ce7406ed9)
+- MLC LLM [commit](https://github.com/mlc-ai/mlc-llm/commits/8e94910ec7967cbe749dbf04713f96a52cccbc19), TVM [commit](https://github.com/mlc-ai/relax/commits/e5ca38dd735ba4d30782a4a58bf6195861642eb0) on 10/04/2023;
+- ExllamaV2 [commit](https://github.com/turboderp/exllamav2/commits/9d6fdb952f6705f79415364e9d85989dcda01478) on 10/05/2023;
+- Llama.cpp [commit](https://github.com/ggerganov/llama.cpp/commits/9476b012260a2fb6c67976582d64484ce7406ed9) on 10/02/2023.
