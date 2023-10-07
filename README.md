@@ -223,14 +223,18 @@ In this section, we use Llama2 GPTQ model as an example.
 
 **Step 1**. Build Docker image and download pre-quantized weights from HuggingFace, then log into the docker image and activate Python environment:
 
+<details>
+
 ```bash
 git lfs install
-git clone https://huggingface.co/TheBloke/Llama-2-70B-GPTQ
+git clone https://huggingface.co/TheBloke/Llama-2-7B-GPTQ
 docker build --no-cache -t llm-perf-exllama-v2:v0.1    \
     -f ./docker/Dockerfile.cu121.exllama_v2 .
 ./docker/bash.sh llm-perf-exllama-v2:v0.1
 conda activate python311
 ```
+
+</details>
 
 **Step 2**. Stay logged in, run benchmarking
 
@@ -238,7 +242,7 @@ conda activate python311
 
 For single GPU:
 ```bash
-MODEL_PATH=$(pwd)/Llama-2-70B-GPTQ/
+MODEL_PATH=$(pwd)/Llama-2-7B-GPTQ/
 OUTPUT_LEN=256
 cd /exllamav2
 python test_inference.py -m $MODEL_PATH -p "What is the meaning of life?" -t $OUTPUT_LEN
@@ -246,7 +250,7 @@ python test_inference.py -m $MODEL_PATH -p "What is the meaning of life?" -t $OU
 
 For Multiple GPU:
 ```bash
-MODEL_PATH=$(pwd)/Llama-2-70B-GPTQ/
+MODEL_PATH=$(pwd)/Llama-2-7B-GPTQ/
 OUTPUT_LEN=256
 GPU_SPLIT="17,17" # depend on how you want to split memory
 cd /exllamav2
