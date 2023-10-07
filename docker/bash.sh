@@ -45,7 +45,8 @@ WORKSPACE="$(pwd)"
 if [ "$ENABLE_GPU" == "nv" ]; then
 	if ! type "nvidia-docker" 1>/dev/null 2>/dev/null; then
 		DOCKER_BINARY="docker"
-		CUDA_ENV=" --gpus all "${CUDA_ENV}
+		# Fix for NCCL: https://github.com/NVIDIA/nccl-tests/issues/143
+		CUDA_ENV=" --gpus all --shm-size 16G "${CUDA_ENV}
 	else
 		DOCKER_BINARY="nvidia-docker"
 	fi
