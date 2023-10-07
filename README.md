@@ -277,7 +277,7 @@ python test_inference.py -m $MODEL_PATH -p "What is the meaning of life?" -gs $G
 <details>
 
 ```bash
-docker build -t llm-perf-llama-cpp:v0.1 -f ./docker/Dockerfile.cu121.llama_cpp .
+docker build --no-cache -t llm-perf-llama-cpp:v0.1 -f ./docker/Dockerfile.cu121.llama_cpp .
 ```
 
 </details>
@@ -318,7 +318,8 @@ CUDA_VISIBLE_DEVICES=0,1 ./build/bin/main -m /workspace/llama_cpp_models/llama-2
 cd /llama.cpp
 conda activate python311
 # convert the weight using llama.cpp script
-python3 convert.py /path/to/Llama-2-70b-hf/ --outfile /workspace/llama_cpp_models/llama-2-70b.fp16.gguf
+python3 convert.py /path/to/Llama-2-70b-hf/ \
+    --outfile /workspace/llama_cpp_models/llama-2-70b.fp16.gguf
 # run fp16 models on 4 GPUs.
 CUDA_VISIBLE_DEVICES=0,1,2,3 ./build/bin/main -m /workspace/llama-2-70b.fp16.gguf -p "What is the meaning of life?" -n 256 -ngl 999 --ignore-eos
 ```
