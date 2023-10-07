@@ -230,6 +230,9 @@ In this section, we use Llama2 GPTQ model as an example.
 ```bash
 git lfs install
 git clone https://huggingface.co/TheBloke/Llama-2-7B-GPTQ
+# git clone https://huggingface.co/TheBloke/Llama-2-70B-chat-GPTQ
+# git clone https://huggingface.co/TheBloke/CodeLlama-34B-Instruct-GPTQ
+
 docker build --no-cache -t llm-perf-exllama-v2:v0.1    \
     -f ./docker/Dockerfile.cu121.exllama_v2 .
 ./docker/bash.sh llm-perf-exllama-v2:v0.1
@@ -289,7 +292,9 @@ docker build --no-cache -t llm-perf-llama-cpp:v0.1 -f ./docker/Dockerfile.cu121.
 
 ```bash
 mkdir -p ./llama_cpp_models
-wget -O ./llama_cpp_models/llama-2-7b.Q4_K_M.gguf https://huggingface.co/TheBloke/Llama-2-7B-GGUF/resolve/main/llama-2-7b.Q4_K_M.gguf 
+wget -O ./llama_cpp_models/llama-2-7b.Q4_K_M.gguf https://huggingface.co/TheBloke/Llama-2-7B-GGUF/resolve/main/llama-2-7b.Q4_K_M.gguf
+wget -O ./llama_cpp_models/llama-2-70b.Q4_K_M.gguf https://huggingface.co/TheBloke/Llama-2-70B-GGUF/resolve/main/llama-2-70b.Q4_K_M.gguf
+wget -O ./llama_cpp_models/codellama-34b.Q4_K_M.gguf https://huggingface.co/TheBloke/CodeLlama-34B-GGUF/resolve/main/codellama-34b.Q4_K_M.gguf
 # wget -O ./llama_cpp_models/llama-2-13b.Q4_K_M.gguf https://huggingface.co/TheBloke/Llama-2-13B-GGUF/resolve/main/llama-2-13b.Q4_K_M.gguf
 # wget -O ./llama_cpp_models/llama-2-70b.Q4_K_M.gguf https://huggingface.co/TheBloke/Llama-2-70B-GGUF/resolve/main/llama-2-70b.Q4_K_M.gguf
 ```
