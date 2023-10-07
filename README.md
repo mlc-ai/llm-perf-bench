@@ -257,7 +257,7 @@ MAX_JOBS=16 python -m pip install flash-attn --no-build-isolation
 
 For single GPU:
 ```bash
-MODEL_PATH=$(pwd)/Llama-2-7B-GPTQ/
+MODEL_PATH=/workspace/Llama-2-7B-GPTQ/
 OUTPUT_LEN=256
 cd /exllamav2
 python test_inference.py -m $MODEL_PATH -p "What is the meaning of life?" -t $OUTPUT_LEN
