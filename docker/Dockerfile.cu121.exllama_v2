@@ -13,9 +13,11 @@ RUN apt update                                                          && \
     apt install --yes wget curl git vim build-essential openssh-server
 
 RUN bash <(curl -L micro.mamba.pm/install.sh) && source ~/.bashrc       && \
-    micromamba create --yes -n python311 -c conda-forge python=3.11     && \
+    micromamba create --yes -n python311                                   \
+      -c pytorch-nightly -c nvidia -c conda-forge                          \
+      python=3.11 pytorch "pytorch-cuda==12.1" packaging ninja             \
+      "cuda-toolkit==12.1" "cuda-version==12.1"                         && \
     micromamba activate python311                                       && \
-    pip3 install torch torchvision torchaudio packaging ninja           && \
     pip3 install flash-attn --no-build-isolation
 
 RUN git clone https://github.com/turboderp/exllamav2.git /exllamav2     && \
