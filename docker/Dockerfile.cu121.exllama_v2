@@ -22,3 +22,6 @@ RUN bash <(curl -L micro.mamba.pm/install.sh) && source ~/.bashrc           && \
       pytorch "pytorch-cuda==12.1" "cuda-toolkit==12.1" "cuda-version==12.1"   \
       packaging ninja fastparquet pandas pygments websockets                   \
       "sentencepiece>=0.1.97" "safetensors>=0.3.2"
+
+RUN source ~/.bashrc && micromamba activate python311                       && \
+    MAX_JOBS=4 python -m pip install flash-attn --no-build-isolation
