@@ -15,10 +15,13 @@ RUN apt update                                                          && \
 RUN git clone https://github.com/turboderp/exllamav2.git /exllamav2     && \
     echo "export PYTHONPATH=\"/exllamav2/:$PYTHONPATH\"" >> ~/.bashrc
 
-RUN bash <(curl -L micro.mamba.pm/install.sh) && source ~/.bashrc       && \
-    micromamba create --yes -n python311                                   \
-      -c pytorch-nightly -c nvidia -c conda-forge                          \
-      python=3.11 "pytorch-cuda==12.1" packaging ninja                     \
-      "cuda-toolkit==12.1" "cuda-version==12.1"                         && \
-    micromamba activate python311                                       && \
-    pip3 install -r /exllamav2/requirements.txt
+RUN bash <(curl -L micro.mamba.pm/install.sh) && source ~/.bashrc           && \
+    micromamba create --yes -n python311                                       \
+      -c pytorch-nightly -c nvidia -c conda-forge                              \
+      python=3.11                                                              \
+      pytorch "pytorch-cuda==12.1" "cuda-toolkit==12.1" "cuda-version==12.1"   \
+      packaging ninja fastparquet pandas pygments websockets                   \
+      "sentencepiece>=0.1.97" "safetensors>=0.3.2"
+
+RUN source ~/.bashrc && micromamba activate python311                       && \
+    MAX_JOBS=4 python -m pip install flash-attn --no-build-isolation

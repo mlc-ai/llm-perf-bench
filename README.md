@@ -9,8 +9,8 @@ LLM Performance Benchmarking
 |------------|-------------|-------------------|----------------------|---------------------|
 | Llama2-7B  | RTX 3090 Ti | 186.7             | 161.67               | 134.54              |
 | Llama2-13B | RTX 3090 Ti | 107.4             | 92.11                | 81.48               |
-| Llama2-7B  | RTX 4090    | 204.8             | 152.56               | 151.1               |
-| Llama2-13B | RTX 4090    | 113.5             | 93.88                | 88.0                |
+| Llama2-7B  | RTX 4090    | 204.8             | 177.46               | 151.1               |
+| Llama2-13B | RTX 4090    | 113.5             | 105.94                | 88.0                |
 
 All experiments are based on int4-quantized weights, fp16 activation and compute, decoding for 256 tokens with a prompt "What is the meaning of life?".
 
@@ -59,6 +59,8 @@ cd llm-perf-bench
 ```
 
 Now you are ready to proceed with the next steps in the repository.
+
+---
 
 ### MLC LLM
 
@@ -219,6 +221,8 @@ python -m mlc_chat.cli.benchmark \
 
 </details>
 
+---
+
 ### Exllama V2
 
 In this section, we use Llama2 GPTQ model as an example.
@@ -241,23 +245,16 @@ conda activate python311
 
 </details>
 
-**Step 2**. Stay logged in, install flash-attn:
+**NOTE**. Docker image building for ExllamaV2 is particularly memory consuming on certain GPU instances.
+Kill the process in time if it lags or screen freezes.
 
-<details>
-
-```bash
-MAX_JOBS=16 python -m pip install flash-attn --no-build-isolation
-```
-
-</details>
-
-**Step 3**. Stay logged in, run benchmarking
+**Step 2**. Stay logged in, run benchmarking
 
 <details>
 
 For single GPU:
 ```bash
-MODEL_PATH=$(pwd)/Llama-2-7B-GPTQ/
+MODEL_PATH=/workspace/Llama-2-7B-GPTQ/
 OUTPUT_LEN=256
 cd /exllamav2
 python test_inference.py -m $MODEL_PATH -p "What is the meaning of life?" -t $OUTPUT_LEN
@@ -273,6 +270,8 @@ python test_inference.py -m $MODEL_PATH -p "What is the meaning of life?" -gs $G
 ```
 
 </details>
+
+---
 
 ### Llama.cpp
 
@@ -332,7 +331,10 @@ CUDA_VISIBLE_DEVICES=0,1,2,3 ./build/bin/main -m /workspace/llama_cpp_models/lla
 
 </details>
 
-### HuggingFace
+---
+
+### HuggingFace Transformer
+
 **Step 1**. Build Docker image:
 
 <details>
@@ -376,4 +378,5 @@ CUDA_VISIBLE_DEVICES=0,1 python scripts/benchmark_hf.py --model-path ./Llama-2-7
 We are using the following commits:
 - MLC LLM [commit](https://github.com/mlc-ai/mlc-llm/commits/8e94910ec7967cbe749dbf04713f96a52cccbc19), TVM [commit](https://github.com/mlc-ai/relax/commits/e5ca38dd735ba4d30782a4a58bf6195861642eb0) on 10/04/2023;
 - ExllamaV2 [commit](https://github.com/turboderp/exllamav2/commits/9d6fdb952f6705f79415364e9d85989dcda01478) on 10/05/2023;
-- Llama.cpp [commit](https://github.com/ggerganov/llama.cpp/commits/9476b012260a2fb6c67976582d64484ce7406ed9) on 10/02/2023.
+- Llama.cpp [commit](https://github.com/ggerganov/llama.cpp/commits/9476b012260a2fb6c67976582d64484ce7406ed9) on 10/02/2023;
+- HuggingFace transformers 4.33.3 on 10/06/2023.
