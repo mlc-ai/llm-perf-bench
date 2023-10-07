@@ -12,17 +12,14 @@ RUN grep -v '[ -z "\$PS1" ] && return' ~/.bashrc >/tmp/bashrc && \
 RUN apt update                                                          && \
     apt install --yes wget curl git vim build-essential openssh-server
 
+RUN git clone https://github.com/turboderp/exllamav2.git /exllamav2     && \
+    echo "export PYTHONPATH=\"/exllamav2/:$PYTHONPATH\"" >> ~/.bashrc
+
 RUN bash <(curl -L micro.mamba.pm/install.sh) && source ~/.bashrc       && \
     micromamba create --yes -n python311                                   \
       -c pytorch-nightly -c nvidia -c conda-forge                          \
       python=3.11 pytorch "pytorch-cuda==12.1" packaging ninja             \
       "cuda-toolkit==12.1" "cuda-version==12.1"                         && \
     micromamba activate python311                                       && \
-    pip3 install flash-attn --no-build-isolation
-
-RUN git clone https://github.com/turboderp/exllamav2.git /exllamav2     && \
-    echo "export PYTHONPATH=\"/exllamav2/:$PYTHONPATH\"" >> ~/.bashrc
-
-RUN source ~/.bashrc                                                    && \
-    micromamba activate python311                                       && \
     pip3 install -r /exllamav2/requirements.txt
+    # pip3 install flash-attn --no-build-isolation
