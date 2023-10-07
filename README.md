@@ -9,8 +9,8 @@ LLM Performance Benchmarking
 |------------|-------------|-------------------|----------------------|---------------------|
 | Llama2-7B  | RTX 3090 Ti | 186.7             | 161.67               | 134.54              |
 | Llama2-13B | RTX 3090 Ti | 107.4             | 92.11                | 81.48               |
-| Llama2-7B  | RTX 4090    | 204.8             | 152.56               | 151.1               |
-| Llama2-13B | RTX 4090    | 113.5             | 93.88                | 88.0                |
+| Llama2-7B  | RTX 4090    | 204.8             | 177.46               | 151.1               |
+| Llama2-13B | RTX 4090    | 113.5             | 105.94                | 88.0                |
 
 All experiments are based on int4-quantized weights, fp16 activation and compute, decoding for 256 tokens with a prompt "What is the meaning of life?".
 
