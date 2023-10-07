@@ -239,7 +239,7 @@ conda activate python311
 For single GPU:
 ```bash
 MODEL_PATH=$(pwd)/Llama-2-70B-GPTQ/
-OUTPUT_LEN=250
+OUTPUT_LEN=256
 cd /exllamav2
 python test_inference.py -m $MODEL_PATH -p "What is the meaning of life?" -t $OUTPUT_LEN
 ```
@@ -247,9 +247,9 @@ python test_inference.py -m $MODEL_PATH -p "What is the meaning of life?" -t $OU
 For Multiple GPU:
 ```bash
 MODEL_PATH=$(pwd)/Llama-2-70B-GPTQ/
-OUTPUT_LEN=250
+OUTPUT_LEN=256
 GPU_SPLIT="17,17" # depend on how you want to split memory
-cd exllamav2
+cd /exllamav2
 python test_inference.py -m $MODEL_PATH -p "What is the meaning of life?" -gs $GPU_SPLIT -t $OUTPUT_LEN
 ```
 </details>
