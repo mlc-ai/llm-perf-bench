@@ -1,6 +1,6 @@
 # NOTE: This Dockerfile is based on CUDA 12.1.
 # To benchmark on other CUDA versions, search and replace "12.1" and "121".
-FROM nvidia/cuda:12.1.0-devel-ubuntu22.04
+FROM nvidia/cuda:12.1.1-devel-ubuntu22.04
 
 SHELL ["/bin/bash", "-ec"]
 
