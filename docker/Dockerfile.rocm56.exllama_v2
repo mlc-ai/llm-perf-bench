@@ -1,0 +1,26 @@
+# NOTE: This Dockerfile is based on ROCm 5.6.
+# To benchmark on other ROCm versions, search and replace "5.6" and "56".
+# WARNING: it doesn't work yet
+FROM rocm/dev-ubuntu-22.04:5.6-complete
+
+SHELL ["/bin/bash", "-ec"]
+
+RUN grep -v '[ -z "\$PS1" ] && return' ~/.bashrc >/tmp/bashrc && \
+    echo "alias conda=micromamba" >>/tmp/bashrc               && \
+    mv /tmp/bashrc ~/.bashrc
+
+RUN apt update                                                          && \
+    apt install --yes wget curl git vim build-essential openssh-server
+
+RUN git clone https://github.com/turboderp/exllamav2.git /exllamav2     && \
+    echo "export PYTHONPATH=\"/exllamav2/:$PYTHONPATH\"" >> ~/.bashrc
+
+RUN bash <(curl -L micro.mamba.pm/install.sh) && source ~/.bashrc               && \
+    micromamba create --yes -n python311                                           \
+      -c conda-forge                                                               \
+      python=3.11 packaging ninja fastparquet pandas pygments websockets           \
+      "sentencepiece>=0.1.97" "safetensors>=0.3.2"                                 \
+      jinja2 markupsafe pillow certifi charset-normalizer filelock idna            \
+      mpmath networkx requests sympy typing_extensions urllib3                  && \
+    micromamba activate python311                                               && \
+    pip3 install torch --index-url https://download.pytorch.org/whl/rocm5.6
