@@ -14,7 +14,7 @@ RUN apt update                                                          && \
 
 RUN bash <(curl -L micro.mamba.pm/install.sh) && source ~/.bashrc       && \
     micromamba create --yes -n python311 -c conda-forge                    \
-    python=3.11 pytorch-cpu                                             && \
+    python=3.11 pytorch-cpu git-lfs                                            && \
     micromamba activate python311                                       && \
     pip install --pre --force-reinstall -f https://mlc.ai/wheels           \
                 mlc-ai-nightly-cu121                                       \
