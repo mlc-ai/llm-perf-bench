@@ -386,9 +386,10 @@ git clone https://huggingface.co/TheBloke/Llama-2-7B-fp16
 docker build --no-cache -t llm-perf-vllm:v0.1    \
     -f ./docker/Dockerfile.cu118.vllm .
 ./docker/bash.sh llm-perf-vllm:v0.1
-conda activate python311
 ```
+
 </details>
+
 **Step 2**. Modify script and run benchmarking
 
 TODO: Fix script for single batch & allow prompt input instead of dummy
