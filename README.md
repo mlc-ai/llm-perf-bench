@@ -378,6 +378,7 @@ CUDA_VISIBLE_DEVICES=0,1 python scripts/benchmark_hf.py --model-path ./Llama-2-7
 In this section, we use Llama2 GPTQ model as an example.
 
 **Step 1**. Build Docker image and download pre-quantized weights from HuggingFace, then log into the docker image and activate Python environment:
+<details>
 
 ```bash
 git lfs install
@@ -387,32 +388,37 @@ docker build --no-cache -t llm-perf-vllm:v0.1    \
 ./docker/bash.sh llm-perf-vllm:v0.1
 conda activate python311
 ```
+</details>
+**Step 2**. Modify script and run benchmarking
 
-**Step 2**. Stay logged in, run benchmarking
+TODO: Fix script for single batch & allow prompt input instead of dummy
 
 <details>
 
-
-    pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118 && \
-    pip3 install -e .
-
-
 For single GPU:
 ```bash
-MODEL_PATH=$(pwd)/Llama-2-70B-fp16/
+MODEL_PATH=$(pwd)/Llama-2-7B-fp16/
 OUTPUT_LEN=256
-cd /vllm
-python test_inference.py -m $MODEL_PATH -p "What is the meaning of life?" -t $OUTPUT_LEN
+cd /vllm && python benchmarks/benchmark_latency.py \
+--model $MODEL_PATH \
+--output-len $OUTPUT_LEN \
+--batch-size 1 \
+--input-len 7 # for prompt "What is the meaning of life?"
 ```
 
-For Multiple GPU:
+For multiple GPUs:
 ```bash
-MODEL_PATH=$(pwd)/Llama-2-70B-fp16/
+MODEL_PATH=$(pwd)/Llama-2-7B-fp16/
 OUTPUT_LEN=256
-GPU_SPLIT="17,17" # depend on how you want to split memory
-cd /vllm
-python test_inference.py -m $MODEL_PATH -p "What is the meaning of life?" -gs $GPU_SPLIT -t $OUTPUT_LEN
+GPU_NUM=2
+cd /vllm && python benchmarks/benchmark_latency.py \
+--model $MODEL_PATH \
+--output-len $OUTPUT_LEN \
+--tensor-parallel-size $GPU_NUM \
+--batch-size 1 \
+--input-len 7 # for prompt "What is the meaning of life?"
 ```
+
 </details>
 
 ## Setup Details
