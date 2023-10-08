@@ -94,7 +94,7 @@ git clone https://huggingface.co/mlc-ai/mlc-chat-Llama-2-7b-chat-hf-q4f16_1
 docker build --no-cache -t llm-perf-mlc:v0.1    \
     -f ./docker/Dockerfile.cu121.mlc .
 ./docker/bash.sh llm-perf-mlc:v0.1
-conda activate python311
+
 ```
 
 </td>
@@ -104,7 +104,6 @@ conda activate python311
 docker build --no-cache -t llm-perf-mlc:v0.1    \
     -f ./docker/Dockerfile.rocm57.mlc .
 ./docker/bash.sh --amd llm-perf-mlc:v0.1
-conda activate python311
 ```
 
 </td>
@@ -118,6 +117,7 @@ conda activate python311
 <details>
 
 ```bash
+conda activate python311
 MODEL_NAME=Llama-2-7b-chat-hf
 QUANTIZATION=q4f16_1
 NUM_SHARDS=1
