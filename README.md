@@ -373,10 +373,53 @@ CUDA_VISIBLE_DEVICES=0,1 python scripts/benchmark_hf.py --model-path ./Llama-2-7
 
 </details>
 
+### vLLM
+
+In this section, we use Llama2 GPTQ model as an example.
+
+**Step 1**. Build Docker image and download pre-quantized weights from HuggingFace, then log into the docker image and activate Python environment:
+
+```bash
+git lfs install
+git clone https://huggingface.co/TheBloke/Llama-2-70B-fp16
+docker build --no-cache -t llm-perf-vllm:v0.1    \
+    -f ./docker/Dockerfile.cu118.vllm .
+./docker/bash.sh llm-perf-vllm:v0.1
+conda activate python311
+```
+
+**Step 2**. Stay logged in, run benchmarking
+
+<details>
+
+
+    pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118 && \
+    pip3 install -e .
+
+
+For single GPU:
+```bash
+MODEL_PATH=$(pwd)/Llama-2-70B-fp16/
+OUTPUT_LEN=256
+cd /vllm
+python test_inference.py -m $MODEL_PATH -p "What is the meaning of life?" -t $OUTPUT_LEN
+```
+
+For Multiple GPU:
+```bash
+MODEL_PATH=$(pwd)/Llama-2-70B-fp16/
+OUTPUT_LEN=256
+GPU_SPLIT="17,17" # depend on how you want to split memory
+cd /vllm
+python test_inference.py -m $MODEL_PATH -p "What is the meaning of life?" -gs $GPU_SPLIT -t $OUTPUT_LEN
+```
+</details>
+
 ## Setup Details
 
 We are using the following commits:
 - MLC LLM [commit](https://github.com/mlc-ai/mlc-llm/commits/8e94910ec7967cbe749dbf04713f96a52cccbc19), TVM [commit](https://github.com/mlc-ai/relax/commits/e5ca38dd735ba4d30782a4a58bf6195861642eb0) on 10/04/2023;
 - ExllamaV2 [commit](https://github.com/turboderp/exllamav2/commits/9d6fdb952f6705f79415364e9d85989dcda01478) on 10/05/2023;
 - Llama.cpp [commit](https://github.com/ggerganov/llama.cpp/commits/9476b012260a2fb6c67976582d64484ce7406ed9) on 10/02/2023;
+- vLLM [commit](https://github.com/vllm-project/vllm/commit/acbed3ef40f015fcf64460e629813922fab90380) on 10/06/2023;
 - HuggingFace transformers 4.33.3 on 10/06/2023.
