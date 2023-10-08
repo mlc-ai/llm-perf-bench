@@ -382,7 +382,7 @@ In this section, we use Llama2 GPTQ model as an example.
 
 ```bash
 git lfs install
-git clone https://huggingface.co/TheBloke/Llama-2-70B-fp16
+git clone https://huggingface.co/TheBloke/Llama-2-7B-fp16
 docker build --no-cache -t llm-perf-vllm:v0.1    \
     -f ./docker/Dockerfile.cu118.vllm .
 ./docker/bash.sh llm-perf-vllm:v0.1
