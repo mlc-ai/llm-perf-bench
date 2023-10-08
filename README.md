@@ -392,14 +392,23 @@ docker build --no-cache -t llm-perf-vllm:v0.1    \
 
 **Step 2**. Modify script and run benchmarking
 
-TODO: Fix script for single batch & allow prompt input instead of dummy
-
 <details>
+
+To skip limitation of max number of batched tokens, we can use the following script to skip argument verification:
+```bash
+sed -i '287s/self._verify_args()/# self._verify_args()/' /vllm/vllm/config.py
+```
+To make the output information more readable:
+```bash
+sed -i '63i\    print(f"Speed: {args.output_len / np.mean(latencies):.2f} tok/s")' /vllm/benchmarks/benchmark_latency.py
+sed -i '64i\    print(f"Speed: {np.mean(latencies)/ args.output_len:.5f} s/tok")' /vllm/benchmarks/benchmark_latency.py
+```
 
 For single GPU:
 ```bash
 MODEL_PATH=$(pwd)/Llama-2-7B-fp16/
 OUTPUT_LEN=256
+micromamba activate python311
 cd /vllm && python benchmarks/benchmark_latency.py \
 --model $MODEL_PATH \
 --output-len $OUTPUT_LEN \
@@ -411,6 +420,7 @@ For multiple GPUs:
 ```bash
 MODEL_PATH=$(pwd)/Llama-2-7B-fp16/
 OUTPUT_LEN=256
+micromamba activate python311
 GPU_NUM=2
 cd /vllm && python benchmarks/benchmark_latency.py \
 --model $MODEL_PATH \
