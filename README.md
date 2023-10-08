@@ -315,7 +315,7 @@ CUDA_VISIBLE_DEVICES=0,1 ./build/bin/main -m /workspace/llama_cpp_models/llama-2
 
 </details>
 
-**Note**. For float16 models, stay logged in and convert the hf models(download [here](https://huggingface.co/meta-llama/Llama-2-70b-hf)) to GGUF FP16 format first.
+**Note**. For float16 models, stay logged in and convert the hf models (download [here](https://huggingface.co/meta-llama/Llama-2-70b-hf)) to GGUF FP16 format first.
 
 <details>
 
@@ -358,7 +358,7 @@ git clone https://huggingface.co/meta-llama/Llama-2-7b-hf
 
 </details>
 
-**Step 3**. Log into docker and run the python script to see the performance numbers. Note that modify `CUDA_VISIBLE_DEVICES` settings for different numbers of GPUs experiments.:
+**Step 3**. Log into docker and run the python script to see the performance numbers. Note that modify `CUDA_VISIBLE_DEVICES` settings for different numbers of GPUs experiments:
 
 <details>
 

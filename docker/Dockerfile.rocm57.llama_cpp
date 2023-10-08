@@ -1,0 +1,30 @@
+# NOTE: This Dockerfile is based on ROCm 12.1.
+# To benchmark on other ROCm versions, search and replace "5.7" and "57".
+# WARNING: it doesn't work yet
+FROM rocm/dev-ubuntu-22.04:5.7-complete
+
+SHELL ["/bin/bash", "-ec"]
+
+# Step 1. Set up bashrc
+RUN grep -v '[ -z "\$PS1" ] && return' ~/.bashrc >/tmp/bashrc                               && \
+    echo "alias conda=micromamba" >>/tmp/bashrc                                             && \
+    mv /tmp/bashrc ~/.bashrc
+
+RUN apt update                                                                              && \
+    apt install --yes wget curl git vim build-essential openssh-server cmake
+
+# Step 2. Git clone and compile llama.cpp with HIPBLAS
+RUN git clone https://github.com/ggerganov/llama.cpp.git /llama.cpp                         && \
+    cd /llama.cpp                                                                           && \
+    git checkout 9476b012260a2fb6c67976582d64484ce7406ed9                                   && \
+    export CC=/opt/rocm/llvm/bin/clang                                                      && \
+    export CXX=/opt/rocm/llvm/bin/clang++                                                   && \
+    make LLAMA_HIPBLAS=1 -j$(proc)
+
+# Step 3. Set up python
+RUN cd /llama.cpp  && \
+    bash <(curl -L micro.mamba.pm/install.sh) && source ~/.bashrc                           && \
+    micromamba create --yes -n python311 -c conda-forge                                        \
+    python=3.11                                                                             && \
+    micromamba activate python311                                                           && \
+    python3 -m pip install -r requirements.txt
