@@ -373,10 +373,77 @@ CUDA_VISIBLE_DEVICES=0,1 python scripts/benchmark_hf.py --model-path ./Llama-2-7
 
 </details>
 
+---
+
+### vLLM
+
+In this section, we use Llama2 GPTQ model as an example.
+
+**Step 1**. Build Docker image and download pre-quantized weights from HuggingFace, then log into the docker image and activate Python environment:
+<details>
+
+```bash
+git lfs install
+git clone https://huggingface.co/TheBloke/Llama-2-7B-fp16
+# You can also git clone awq models, e.g.
+# git clone https://huggingface.co/TheBloke/Llama-2-70B-AWQ
+docker build --no-cache -t llm-perf-vllm:v0.1    \
+    -f ./docker/Dockerfile.cu118.vllm .
+./docker/bash.sh llm-perf-vllm:v0.1
+conda activate python311
+```
+
+</details>
+
+**Step 2**. Modify script and run benchmarking
+
+<details>
+
+To skip limitation of max number of batched tokens, we can use the following script to skip argument verification,
+and make the benchmark results more readable:
+
+```bash
+sed -i '287s/self._verify_args()/# self._verify_args()/' /vllm/vllm/config.py
+sed -i '63i\    print(f"Speed: {args.output_len / np.mean(latencies):.2f} tok/s")' /vllm/benchmarks/benchmark_latency.py
+sed -i '64i\    print(f"Speed: {np.mean(latencies)/ args.output_len:.5f} s/tok")' /vllm/benchmarks/benchmark_latency.py
+```
+
+To benchmark fp16 performance:
+
+```bash
+MODEL_PATH=/workspace/Llama-2-7B-fp16/
+OUTPUT_LEN=256
+GPU_NUM=1
+cd /vllm && python benchmarks/benchmark_latency.py \
+--model $MODEL_PATH \
+--output-len $OUTPUT_LEN \
+--tensor-parallel-size $GPU_NUM \
+--batch-size 1 \
+--input-len 7 # for prompt "What is the meaning of life?"
+```
+
+And for 4-bit AWQ model:
+
+```bash
+MODEL_PATH=/workspace/Llama-2-7B-AWQ/
+OUTPUT_LEN=256
+GPU_NUM=1
+cd /vllm && python benchmarks/benchmark_latency.py \
+--model $MODEL_PATH \
+--output-len $OUTPUT_LEN \
+--tensor-parallel-size $GPU_NUM \
+--batch-size 1 \
+--quantization awq \
+--input-len 7 # for prompt "What is the meaning of life?"
+```
+
+</details>
+
 ## Setup Details
 
 We are using the following commits:
 - MLC LLM [commit](https://github.com/mlc-ai/mlc-llm/commits/8e94910ec7967cbe749dbf04713f96a52cccbc19), TVM [commit](https://github.com/mlc-ai/relax/commits/e5ca38dd735ba4d30782a4a58bf6195861642eb0) on 10/04/2023;
 - ExllamaV2 [commit](https://github.com/turboderp/exllamav2/commits/9d6fdb952f6705f79415364e9d85989dcda01478) on 10/05/2023;
 - Llama.cpp [commit](https://github.com/ggerganov/llama.cpp/commits/9476b012260a2fb6c67976582d64484ce7406ed9) on 10/02/2023;
+- vLLM [commit](https://github.com/vllm-project/vllm/commit/acbed3ef40f015fcf64460e629813922fab90380) on 10/06/2023;
 - HuggingFace transformers 4.33.3 on 10/06/2023.
