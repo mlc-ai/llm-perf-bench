@@ -373,6 +373,8 @@ CUDA_VISIBLE_DEVICES=0,1 python scripts/benchmark_hf.py --model-path ./Llama-2-7
 
 </details>
 
+---
+
 ### vLLM
 
 In this section, we use Llama2 GPTQ model as an example.
@@ -388,6 +390,7 @@ git clone https://huggingface.co/TheBloke/Llama-2-7B-fp16
 docker build --no-cache -t llm-perf-vllm:v0.1    \
     -f ./docker/Dockerfile.cu118.vllm .
 ./docker/bash.sh llm-perf-vllm:v0.1
+conda activate python311
 ```
 
 </details>
@@ -396,34 +399,21 @@ docker build --no-cache -t llm-perf-vllm:v0.1    \
 
 <details>
 
-To skip limitation of max number of batched tokens, we can use the following script to skip argument verification:
+To skip limitation of max number of batched tokens, we can use the following script to skip argument verification,
+and make the benchmark results more readable:
+
 ```bash
 sed -i '287s/self._verify_args()/# self._verify_args()/' /vllm/vllm/config.py
-```
-To make the output information more readable:
-```bash
 sed -i '63i\    print(f"Speed: {args.output_len / np.mean(latencies):.2f} tok/s")' /vllm/benchmarks/benchmark_latency.py
 sed -i '64i\    print(f"Speed: {np.mean(latencies)/ args.output_len:.5f} s/tok")' /vllm/benchmarks/benchmark_latency.py
 ```
 
-For single GPU:
-```bash
-MODEL_PATH=$(pwd)/Llama-2-7B-fp16/
-OUTPUT_LEN=256
-micromamba activate python311
-cd /vllm && python benchmarks/benchmark_latency.py \
---model $MODEL_PATH \
---output-len $OUTPUT_LEN \
---batch-size 1 \
---input-len 7 # for prompt "What is the meaning of life?"
-```
+To benchmark fp16 performance:
 
-For multiple GPUs:
 ```bash
-MODEL_PATH=$(pwd)/Llama-2-7B-fp16/
+MODEL_PATH=/workspace/Llama-2-7B-fp16/
 OUTPUT_LEN=256
-micromamba activate python311
-GPU_NUM=2
+GPU_NUM=1
 cd /vllm && python benchmarks/benchmark_latency.py \
 --model $MODEL_PATH \
 --output-len $OUTPUT_LEN \
@@ -432,12 +422,12 @@ cd /vllm && python benchmarks/benchmark_latency.py \
 --input-len 7 # for prompt "What is the meaning of life?"
 ```
 
-For AWQ model:
+And for 4-bit AWQ model:
+
 ```bash
-MODEL_PATH=$(pwd)/Llama-2-7B-fp16/
+MODEL_PATH=/workspace/Llama-2-7B-AWQ/
 OUTPUT_LEN=256
-micromamba activate python311
-GPU_NUM=2
+GPU_NUM=1
 cd /vllm && python benchmarks/benchmark_latency.py \
 --model $MODEL_PATH \
 --output-len $OUTPUT_LEN \
