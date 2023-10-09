@@ -291,11 +291,11 @@ docker build --no-cache -t llm-perf-llama-cpp:v0.1 -f ./docker/Dockerfile.cu121.
 
 ```bash
 mkdir -p ./llama_cpp_models
-wget -O ./llama_cpp_models/llama-2-7b.Q4_0.gguf https://huggingface.co/TheBloke/Llama-2-7B-Chat-GGUF/resolve/main/llama-2-7b-chat.Q4_0.gguf
-wget -O ./llama_cpp_models/llama-2-70b.Q4_0.gguf https://huggingface.co/TheBloke/Llama-2-70B-chat-GGUF/resolve/main/llama-2-70b-chat.Q4_0.gguf
+wget -O ./llama_cpp_models/llama-2-7b-chat.Q4_0.gguf https://huggingface.co/TheBloke/Llama-2-7B-Chat-GGUF/resolve/main/llama-2-7b-chat.Q4_0.gguf
+wget -O ./llama_cpp_models/llama-2-70b-chat.Q4_0.gguf https://huggingface.co/TheBloke/Llama-2-70B-chat-GGUF/resolve/main/llama-2-70b-chat.Q4_0.gguf
 wget -O ./llama_cpp_models/codellama-34b.Q4_0.gguf https://huggingface.co/TheBloke/CodeLlama-34B-GGUF/resolve/main/codellama-34b.Q4_0.gguf
-# wget -O ./llama_cpp_models/llama-2-13b.Q4_0.gguf https://huggingface.co/TheBloke/Llama-2-13B-chat-GGUF/resolve/main/llama-2-13b-chat.Q4_0.gguf
-# wget -O ./llama_cpp_models/llama-2-70b.Q4_0.gguf https://huggingface.co/TheBloke/Llama-2-70B-chat-GGUF/resolve/main/llama-2-70b-chat.Q4_0.gguf
+# wget -O ./llama_cpp_models/llama-2-13b-chat.Q4_0.gguf https://huggingface.co/TheBloke/Llama-2-13B-chat-GGUF/resolve/main/llama-2-13b-chat.Q4_0.gguf
+# wget -O ./llama_cpp_models/llama-2-70b-chat.Q4_0.gguf https://huggingface.co/TheBloke/Llama-2-70B-chat-GGUF/resolve/main/llama-2-70b-chat.Q4_0.gguf
 ```
 
 </details>
