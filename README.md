@@ -383,6 +383,8 @@ In this section, we use Llama2 GPTQ model as an example.
 ```bash
 git lfs install
 git clone https://huggingface.co/TheBloke/Llama-2-7B-fp16
+# You can also git clone awq models, e.g.
+# git clone https://huggingface.co/TheBloke/Llama-2-70B-AWQ
 docker build --no-cache -t llm-perf-vllm:v0.1    \
     -f ./docker/Dockerfile.cu118.vllm .
 ./docker/bash.sh llm-perf-vllm:v0.1
@@ -427,6 +429,21 @@ cd /vllm && python benchmarks/benchmark_latency.py \
 --output-len $OUTPUT_LEN \
 --tensor-parallel-size $GPU_NUM \
 --batch-size 1 \
+--input-len 7 # for prompt "What is the meaning of life?"
+```
+
+For AWQ model:
+```bash
+MODEL_PATH=$(pwd)/Llama-2-7B-fp16/
+OUTPUT_LEN=256
+micromamba activate python311
+GPU_NUM=2
+cd /vllm && python benchmarks/benchmark_latency.py \
+--model $MODEL_PATH \
+--output-len $OUTPUT_LEN \
+--tensor-parallel-size $GPU_NUM \
+--batch-size 1 \
+--quantization awq \
 --input-len 7 # for prompt "What is the meaning of life?"
 ```
 
