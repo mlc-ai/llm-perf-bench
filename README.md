@@ -7,8 +7,8 @@ LLM Performance Benchmarking
 
 | Model      | GPU         | MLC LLM (tok/sec) | Exllama V2 (tok/sec) | Llama.cpp (tok/sec) |
 |------------|-------------|-------------------|----------------------|---------------------|
-| Llama2-7B  | RTX 3090 Ti | 186.7             | 161.67               | 134.54              |
-| Llama2-13B | RTX 3090 Ti | 107.4             | 92.11                | 81.48               |
+| Llama2-7B  | RTX 3090 Ti | 186.7             | 161.67               | 144.93              |
+| Llama2-13B | RTX 3090 Ti | 107.4             | 92.11                | 86.65               |
 | Llama2-7B  | RTX 4090    | 204.8             | 177.46               | 151.1               |
 | Llama2-13B | RTX 4090    | 113.5             | 105.94                | 88.0                |
 
@@ -291,11 +291,11 @@ docker build --no-cache -t llm-perf-llama-cpp:v0.1 -f ./docker/Dockerfile.cu121.
 
 ```bash
 mkdir -p ./llama_cpp_models
-wget -O ./llama_cpp_models/llama-2-7b.Q4_K_M.gguf https://huggingface.co/TheBloke/Llama-2-7B-GGUF/resolve/main/llama-2-7b.Q4_K_M.gguf
-wget -O ./llama_cpp_models/llama-2-70b.Q4_K_M.gguf https://huggingface.co/TheBloke/Llama-2-70B-GGUF/resolve/main/llama-2-70b.Q4_K_M.gguf
-wget -O ./llama_cpp_models/codellama-34b.Q4_K_M.gguf https://huggingface.co/TheBloke/CodeLlama-34B-GGUF/resolve/main/codellama-34b.Q4_K_M.gguf
-# wget -O ./llama_cpp_models/llama-2-13b.Q4_K_M.gguf https://huggingface.co/TheBloke/Llama-2-13B-GGUF/resolve/main/llama-2-13b.Q4_K_M.gguf
-# wget -O ./llama_cpp_models/llama-2-70b.Q4_K_M.gguf https://huggingface.co/TheBloke/Llama-2-70B-GGUF/resolve/main/llama-2-70b.Q4_K_M.gguf
+wget -O ./llama_cpp_models/llama-2-7b-chat.Q4_0.gguf https://huggingface.co/TheBloke/Llama-2-7B-Chat-GGUF/resolve/main/llama-2-7b-chat.Q4_0.gguf
+wget -O ./llama_cpp_models/llama-2-70b-chat.Q4_0.gguf https://huggingface.co/TheBloke/Llama-2-70B-chat-GGUF/resolve/main/llama-2-70b-chat.Q4_0.gguf
+wget -O ./llama_cpp_models/codellama-34b.Q4_0.gguf https://huggingface.co/TheBloke/CodeLlama-34B-GGUF/resolve/main/codellama-34b.Q4_0.gguf
+# wget -O ./llama_cpp_models/llama-2-13b-chat.Q4_0.gguf https://huggingface.co/TheBloke/Llama-2-13B-chat-GGUF/resolve/main/llama-2-13b-chat.Q4_0.gguf
+# wget -O ./llama_cpp_models/llama-2-70b-chat.Q4_0.gguf https://huggingface.co/TheBloke/Llama-2-70B-chat-GGUF/resolve/main/llama-2-70b-chat.Q4_0.gguf
 ```
 
 </details>
@@ -308,9 +308,9 @@ wget -O ./llama_cpp_models/codellama-34b.Q4_K_M.gguf https://huggingface.co/TheB
 ./docker/bash.sh llm-perf-llama-cpp:v0.1
 cd /llama.cpp
 # run quantized Llama-2-7B models on a single GPU.
-CUDA_VISIBLE_DEVICES=0 ./build/bin/main -m /workspace/llama_cpp_models/llama-2-7b.Q4_K_M.gguf -p "What is the meaning of life?" -n 256 -ngl 999 --ignore-eos
+CUDA_VISIBLE_DEVICES=0 ./build/bin/main -m /workspace/llama_cpp_models/llama-2-7b-chat.Q4_0.gguf -p "What is the meaning of life?" -n 256 -ngl 999 --ignore-eos
 # test quantized Llama-2-70B models on 2 GPUS.
-CUDA_VISIBLE_DEVICES=0,1 ./build/bin/main -m /workspace/llama_cpp_models/llama-2-70b.Q4_K_M.gguf -p "What is the meaning of life?" -n 256 -ngl 999 --ignore-eos
+CUDA_VISIBLE_DEVICES=0,1 ./build/bin/main -m /workspace/llama_cpp_models/llama-2-70b-chat.Q4_0.gguf -p "What is the meaning of life?" -n 256 -ngl 999 --ignore-eos
 ```
 
 </details>
