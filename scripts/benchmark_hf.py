@@ -1,11 +1,14 @@
-import copy
-import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
-import time
 import argparse
-from transformers.models.llama import LlamaForCausalLM
-from transformers.generation import LogitsProcessorList, StoppingCriteriaList
+import copy
+import time
+
+import torch
 from torch import nn
+from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
+from transformers.generation import LogitsProcessorList, StoppingCriteriaList
+from transformers.models.llama import LlamaForCausalLM
+
+COMPILE = False
 
 
 class Recorder:
@@ -32,9 +35,11 @@ class Timer:
         self._end_time = None
 
     def __enter__(self):
+        torch.cuda.synchronize()
         self._start_time = time.perf_counter()
 
     def __exit__(self, *exc_info):
+        torch.cuda.synchronize()
         self._end_time = time.perf_counter()
         elapsed_time = self._end_time - self._start_time
         self.recorder.record(self.name, elapsed_time)
@@ -44,6 +49,8 @@ def create_fp16(model_id):
     model = AutoModelForCausalLM.from_pretrained(
         model_id, device_map="auto", torch_dtype=torch.float16, use_safetensors=False
     )
+    if COMPILE:
+        model = torch.compile(model, dynamic=True)
     return model
 
 
@@ -58,6 +65,8 @@ def create_q4fp16(model_id):
         device_map="auto",
         use_safetensors=False,
     )
+    if COMPILE:
+        model = torch.compile(model, dynamic=True)
     return model
 
 
