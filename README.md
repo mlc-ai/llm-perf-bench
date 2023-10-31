@@ -5,7 +5,7 @@ LLM Performance Benchmarking
 
 All experiments are based on fp16 activation and compute, decoding 256 tokens with a prompt "What is the meaning of life?". And all numbers are based on PCIe, not NVLink.
 
-### Int4-quantized, Single GPU
+### Single GPU, 4-bit
 
 | Model      | GPU         | MLC LLM (tok/sec) | Exllama V2 (tok/sec) | Llama.cpp (tok/sec) |
 |------------|-------------|-------------------|----------------------|---------------------|
