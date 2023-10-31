@@ -3,7 +3,7 @@ LLM Performance Benchmarking
 
 ## Performance
 
-All experiments are based on fp16 activation and compute, decoding 256 tokens with a prompt "What is the meaning of life?".
+All experiments are based on fp16 activation and compute, decoding 256 tokens with a prompt "What is the meaning of life?". And all numbers are based on PCIe, not NVLink.
 
 ### Int4-quantized, Single GPU
 
@@ -27,6 +27,8 @@ All experiments are based on fp16 activation and compute, decoding 256 tokens wi
 
 ### Int4-quantized, Multi-GPU
 
+#### NVIDIA GPUs
+
 | Model         | GPU      | MLC-LLM | exllama | Llama.cpp | vLLM  |
 |---------------|----------|---------|---------|-----------|-------|
 | Llama2-70B    | A100 x 1 | 24.4    | 32.6    | 27.18     | 18.07 |
@@ -40,6 +42,15 @@ All experiments are based on fp16 activation and compute, decoding 256 tokens wi
 |               | A10G x 2 | 38.4    | 25.86   | 21.93     | 23.67 |
 |               | A10G x 4 | 61.2    | 25.84   | 23.53     | 29.83 |
 |               | A10G x 8 | 84.2    | 25.82   | 13.25     | N/A   |
+
+#### Game GPUs
+
+| Model         | GPU          | MLC-LLM |
+|---------------|--------------|---------|
+| CodeLlama-34B | RTX 4090 x 2 | 64.9    |
+| Llama2-70B    | RTX 4090 x 2 | 34.5    |
+| CodeLlama-34B | 7900 XTX x 2 | 56.5    |
+| Llama2-70B    | 7900 XTX x 2 | 29.9    |
 
 ## Instructions
 
