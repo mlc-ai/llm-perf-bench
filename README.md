@@ -3,6 +3,8 @@ LLM Performance Benchmarking
 
 ## Performance
 
+All experiments are based on fp16 activation and compute, decoding 256 tokens with a prompt "What is the meaning of life?".
+
 ### Int4-quantized, Single GPU
 
 | Model      | GPU         | MLC LLM (tok/sec) | Exllama V2 (tok/sec) | Llama.cpp (tok/sec) |
@@ -12,11 +14,32 @@ LLM Performance Benchmarking
 | Llama2-7B  | RTX 4090    | 204.8             | 177.46               | 151.1               |
 | Llama2-13B | RTX 4090    | 113.5             | 105.94                | 88.0                |
 
-All experiments are based on int4-quantized weights, fp16 activation and compute, decoding for 256 tokens with a prompt "What is the meaning of life?".
-
 ### FP16, Multi-GPU
 
-TBD
+| Model         | GPU      | MLC LLM (tok/sec) | Exllama V2 (tok/sec) | Llama.cpp (tok/sec) | vLLM (tok/sec) |
+|---------------|----------|-------------------|----------------------|---------------------|----------------|
+| Llama2-70B    | A100 * 2 | 17.0              | N/A                  | 10.46               | 15.27          |
+|               | A100 * 4 | 26.6              | N/A                  | 11.07               | 17.64          |
+|               | A100 * 8 | 38.8              | N/A                  | 9.37                | 14.32          |
+| Llama2-70B    | A10G * 8 | 21.8              | N/A                  | 6.91                | 13.9           |
+| CodeLlama-34B | A10G * 4 | 24.8              | N/A                  | 14.37               | 16.67          |
+|               | A10G * 8 | 41.3              | N/A                  | 11.83               | 23.5           |
+
+### Int4-quantized, Multi-GPU
+
+| Model         | GPU      | MLC-LLM | exllama | Llama.cpp | vLLM  |
+|---------------|----------|---------|---------|-----------|-------|
+| Llama2-70B    | A100 x 1 | 24.4    | 32.6    | 27.18     | 18.07 |
+|               | A100 x 2 | 40.9    | 32.64   | 17.35     | 21.4  |
+|               | A100 x 4 | 55.8    | 30.36   | 15.45     | 21.36 |
+|               | A100 x 8 | 59.4    | 32.23   | 11.2      | 17.6  |
+| Llama2-70B    | A10G x 2 | 19.8    | 13.48   | 11.98     | 12.89 |
+|               | A10G x 4 | 34.3    | 13.48   | 13.37     | 16.91 |
+|               | A10G x 8 | 47.7    | 13.48   | 8.01      | 20.79 |
+| CodeLlama-34B | A10G x 1 | 23.4    | 25.81   | 22.72     | 19.76 |
+|               | A10G x 2 | 38.4    | 25.86   | 21.93     | 23.67 |
+|               | A10G x 4 | 61.2    | 25.84   | 23.53     | 29.83 |
+|               | A10G x 8 | 84.2    | 25.82   | 13.25     | N/A   |
 
 ## Instructions
 
