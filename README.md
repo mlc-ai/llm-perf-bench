@@ -1,6 +1,24 @@
 LLM Performance Benchmarking
 ----------------------------
 
+<!-- TOC start (generated with https://github.com/derlin/bitdowntoc) -->
+
+- [Performance](#performance)
+   * [Single GPU, 4-bit](#single-gpu-4-bit)
+   * [Multiple NVIDIA GPUs, FP16](#multiple-nvidia-gpus-fp16)
+   * [Multiple NVIDIA GPUs, 4-bit](#multiple-nvidia-gpus-4-bit)
+   * [Multiple AMD GPUs, 4-bit](#multiple-amd-gpus-4-bit)
+- [Instructions](#instructions)
+   * [Prerequisites](#prerequisites)
+   * [MLC LLM](#mlc-llm)
+   * [Exllama V2](#exllama-v2)
+   * [Llama.cpp](#llamacpp)
+   * [HuggingFace Transformer](#huggingface-transformer)
+   * [vLLM](#vllm)
+- [Setup Details](#setup-details)
+
+<!-- TOC end -->
+
 ## Performance
 
 All experiments are based on fp16 activation and compute, decoding 256 tokens with a prompt "What is the meaning of life?". And all numbers are based on PCIe, not NVLink.
