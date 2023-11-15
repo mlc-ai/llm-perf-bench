@@ -1,6 +1,6 @@
-# NOTE: This Dockerfile is based on CUDA 11.8.
-# To benchmark on other CUDA versions, search and replace "11.8" and "118".
-FROM nvidia/cuda:11.8.0-devel-ubuntu22.04
+# NOTE: This Dockerfile is based on CUDA 12.1.
+# To benchmark on other CUDA versions, search and replace "12.1" and "121".
+FROM nvidia/cuda:12.1.1-devel-ubuntu22.04
 
 SHELL ["/bin/bash", "-ec"]
 
@@ -16,8 +16,6 @@ RUN bash <(curl -L micro.mamba.pm/install.sh) && source ~/.bashrc       && \
     micromamba create --yes -n python311 -c conda-forge python=3.11
 
 RUN git clone https://github.com/vllm-project/vllm.git /vllm             && \
-    sed -i 's/torch >= 2.0.0/torch == 2.0.1/' /vllm/pyproject.toml             && \
-    sed -i 's/torch >= 2.0.0/torch == 2.0.1/' /vllm/requirements.txt           && \
     echo "export PYTHONPATH=\"/vllm/:$PYTHONPATH\"" >> ~/.bashrc
 
 
