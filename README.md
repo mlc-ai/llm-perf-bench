@@ -438,7 +438,7 @@ git clone https://huggingface.co/TheBloke/Llama-2-7B-fp16
 # You can also git clone awq models, e.g.
 # git clone https://huggingface.co/TheBloke/Llama-2-70B-AWQ
 docker build --no-cache -t llm-perf-vllm:v0.1    \
-    -f ./docker/Dockerfile.cu118.vllm .
+    -f ./docker/Dockerfile.cu121q.vllm .
 ./docker/bash.sh llm-perf-vllm:v0.1
 conda activate python311
 ```
